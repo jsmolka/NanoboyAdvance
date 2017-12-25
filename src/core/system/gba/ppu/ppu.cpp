@@ -358,7 +358,7 @@ namespace Core {
                                 OBJ_PIXEL_SFX_INNER;\
                             }\
                         }\
-                        if (visible[LAYER_SFX]) {\
+                        if (visible[LAYER_SFX] || (layer[0] == LAYER_OBJ && m_obj_layer[x].alpha)) {\
                             PERFORM_SFX_EFFECT;\
                         }\
                         line_buffer[x] = rgb555ToARGB(pixel[0]);\
