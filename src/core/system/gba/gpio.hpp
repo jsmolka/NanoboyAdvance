@@ -28,8 +28,8 @@ namespace Core {
     class GPIO {
     protected:
         enum IOPortDirection {
-            GPIO_DIR_IN  = 0,
-            GPIO_DIR_OUT = 1
+            GPIO_DIR_IN  = 0, // GPIO -> GBA
+            GPIO_DIR_OUT = 1  // GPIO <- GBA
         };
 
     private:
