@@ -27,12 +27,14 @@ namespace Core {
     void GPIO::updateReadWriteMasks() {
         this->read_mask = 0;
 
-        if (portDirection(0) == GPIO_DIR_OUT) this->read_mask |= 1;
-        if (portDirection(1) == GPIO_DIR_OUT) this->read_mask |= 2;
-        if (portDirection(2) == GPIO_DIR_OUT) this->read_mask |= 4;
-        if (portDirection(3) == GPIO_DIR_OUT) this->read_mask |= 8;
+        if (portDirection(0) == GPIO_DIR_OUT) this->write_mask |= 1;
+        if (portDirection(1) == GPIO_DIR_OUT) this->write_mask |= 2;
+        if (portDirection(2) == GPIO_DIR_OUT) this->write_mask |= 4;
+        if (portDirection(3) == GPIO_DIR_OUT) this->write_mask |= 8;
     
-        this->write_mask = ~(this->read_mask) & 15;
+        this->read_mask = ~(this->write_mask) & 15;
+
+        Logger::log<LOG_DEBUG>("GPIO: read_mask=0b{0:B} write_mask=0b{1:B}", this->read_mask, this->write_mask);
     }
 
     auto GPIO::read(std::uint32_t address) -> std::uint8_t {
