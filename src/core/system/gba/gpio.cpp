@@ -24,12 +24,49 @@
 using namespace Util;
 
 namespace Core {
-    void GPIO::write(std::uint32_t address, std::uint8_t value) {
-        Logger::log<LOG_DEBUG>("GPIO: write to 0x{0:X} = 0x{1:X}", address, value);
-    }
-
     auto GPIO::read(std::uint32_t address) -> std::uint8_t {
         Logger::log<LOG_DEBUG>("GPIO: read from 0x{0:X}", address);
+
+        switch (address) {
+            // TODO: implement others.
+            case GPIO_DATA: {
+                return readPort()&15;
+            }
+        }
+
         return 0;
+    }
+
+    void GPIO::write(std::uint32_t address, std::uint8_t value) {
+        Logger::log<LOG_DEBUG>("GPIO: write to 0x{0:X} = 0x{1:X}", address, value);
+
+        switch (address) {
+            case GPIO_DATA: {
+                writePort(value&15);
+                break;
+            }
+            case GPIO_DIRECTION: {
+                this->port_dir[0] = static_cast<IOPortDirection>((value>>0)&1);
+                this->port_dir[1] = static_cast<IOPortDirection>((value>>1)&1);
+                this->port_dir[2] = static_cast<IOPortDirection>((value>>2)&1);
+                this->port_dir[3] = static_cast<IOPortDirection>((value>>3)&1);
+
+                Logger::log<LOG_DEBUG>("GPIO: port_dir[0]={0}", this->port_dir[0]);
+                Logger::log<LOG_DEBUG>("GPIO: port_dir[1]={0}", this->port_dir[1]);
+                Logger::log<LOG_DEBUG>("GPIO: port_dir[2]={0}", this->port_dir[2]);
+                Logger::log<LOG_DEBUG>("GPIO: port_dir[3]={0}", this->port_dir[3]);
+                break;
+            }
+            case GPIO_CONTROL: {
+                this->allow_reads = value & 1;
+                if (this->allow_reads) {
+                    Logger::log<LOG_DEBUG>("GPIO: enabled reading");
+                }
+                else {
+                    Logger::log<LOG_DEBUG>("GPIO: disabled reading");
+                }
+                break;
+            }
+        }
     }
 }

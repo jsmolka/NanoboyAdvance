@@ -24,14 +24,44 @@
 namespace Core {
 
     class GPIO {
+    protected:
+        enum IOPortDirection {
+            GPIO_DIR_IN  = 0,
+            GPIO_DIR_OUT = 1
+        };
+
     private:
+        enum IOPort {
+            GPIO_DATA       = 0xC4,
+            GPIO_DIRECTION  = 0xC6,
+            GPIO_CONTROL    = 0xC8
+        };
+
         bool allow_reads { false };
 
+        IOPortDirection port_dir[4];
+
     public:
-        void write(std::uint32_t address, std::uint8_t value);
+        GPIO() {
+            reset();
+        }
+
+        virtual void reset() {
+            this->port_dir[0] = GPIO_DIR_IN;
+            this->port_dir[1] = GPIO_DIR_IN;
+            this->port_dir[2] = GPIO_DIR_IN;
+            this->port_dir[3] = GPIO_DIR_IN;
+        }
 
         auto read(std::uint32_t address) -> std::uint8_t;
 
-        auto isReadable() -> bool { return allow_reads; }
+        void write(std::uint32_t address, std::uint8_t value);
+
+        auto isReadable() -> bool { return this->allow_reads; }
+
+    protected:
+        virtual auto readPort() -> std::uint8_t { return 0; }
+
+        virtual void writePort(std::uint8_t data) {}
     };
 }

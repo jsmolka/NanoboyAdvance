@@ -29,7 +29,9 @@
 #include "ppu/ppu.hpp"
 #include "apu/apu.hpp"
 #include "cart/cartridge.hpp"
+
 #include "gpio.hpp"
+#include "rtc.hpp"
 
 #include "../../processor/arm/arm.hpp"
 
@@ -54,7 +56,7 @@ namespace Core {
     private:
         Config* config;
 
-        GPIO* gpio = new GPIO(); // TODO: init nullptr
+        GPIO* gpio = new RTC(); // TODO: init nullptr
 
         // Cycles until next PPU phase
         int cycles_left;

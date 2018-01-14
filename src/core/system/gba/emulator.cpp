@@ -63,6 +63,11 @@ namespace Core {
         ppu.reset();
         apu.reset();
 
+        // TODO: set gpio object based on config.
+        if (gpio != nullptr) {
+            gpio->reset();
+        }
+
         // reset cartridge memory
         if (memory.rom.save != nullptr) {
             memory.rom.save->reset();
