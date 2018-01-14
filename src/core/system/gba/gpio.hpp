@@ -21,6 +21,8 @@
 
 #include <cstdint>
 
+#include "enums.hpp"
+
 namespace Core {
 
     class GPIO {
@@ -39,19 +41,29 @@ namespace Core {
 
         bool allow_reads { false };
 
-        IOPortDirection port_dir[4];
+        IOPortDirection port_dir[4] {
+            GPIO_DIR_IN, GPIO_DIR_IN, 
+            GPIO_DIR_IN, GPIO_DIR_IN
+        };
+
+        std::uint16_t& irq_flags;
+
+        std::uint8_t read_mask  { 0 };
+        std::uint8_t write_mask { 15 };
 
     public:
-        GPIO() {
-            reset();
-        }
+        GPIO(std::uint16_t& irq_flags) : irq_flags(irq_flags) { }
 
         virtual void reset() {
             this->port_dir[0] = GPIO_DIR_IN;
             this->port_dir[1] = GPIO_DIR_IN;
             this->port_dir[2] = GPIO_DIR_IN;
             this->port_dir[3] = GPIO_DIR_IN;
+
+            updateReadWriteMasks();
         }
+
+        void updateReadWriteMasks();
 
         auto read(std::uint32_t address) -> std::uint8_t;
 
@@ -60,6 +72,17 @@ namespace Core {
         auto isReadable() -> bool { return this->allow_reads; }
 
     protected:
+        void sendIRQ() {
+            irq_flags |= INTERRUPT_GAMEPAK;
+        }
+
+        auto portDirection(int port) -> IOPortDirection const {
+            if (port >= 4) {
+                return GPIO_DIR_OUT;
+            }
+            return this->port_dir[port];
+        }
+
         virtual auto readPort() -> std::uint8_t { return 0; }
 
         virtual void writePort(std::uint8_t data) {}

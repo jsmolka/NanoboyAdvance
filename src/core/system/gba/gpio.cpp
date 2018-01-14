@@ -24,13 +24,29 @@
 using namespace Util;
 
 namespace Core {
+    void GPIO::updateReadWriteMasks() {
+        this->read_mask = 0;
+
+        if (portDirection(0) == GPIO_DIR_OUT) this->read_mask |= 1;
+        if (portDirection(1) == GPIO_DIR_OUT) this->read_mask |= 2;
+        if (portDirection(2) == GPIO_DIR_OUT) this->read_mask |= 4;
+        if (portDirection(3) == GPIO_DIR_OUT) this->read_mask |= 8;
+    
+        this->write_mask = ~(this->read_mask) & 15;
+    }
+
     auto GPIO::read(std::uint32_t address) -> std::uint8_t {
         Logger::log<LOG_DEBUG>("GPIO: read from 0x{0:X}", address);
 
         switch (address) {
-            // TODO: implement others.
             case GPIO_DATA: {
-                return readPort()&15;
+                return readPort() & this->read_mask;
+            }
+            case GPIO_DIRECTION: {
+                return this->read_mask;
+            }
+            case GPIO_CONTROL: {
+                return this->allow_reads ? 1 : 0;
             }
         }
 
@@ -42,7 +58,7 @@ namespace Core {
 
         switch (address) {
             case GPIO_DATA: {
-                writePort(value&15);
+                writePort(value & this->write_mask);
                 break;
             }
             case GPIO_DIRECTION: {
@@ -50,6 +66,8 @@ namespace Core {
                 this->port_dir[1] = static_cast<IOPortDirection>((value>>1)&1);
                 this->port_dir[2] = static_cast<IOPortDirection>((value>>2)&1);
                 this->port_dir[3] = static_cast<IOPortDirection>((value>>3)&1);
+
+                updateReadWriteMasks();
 
                 Logger::log<LOG_DEBUG>("GPIO: port_dir[0]={0}", this->port_dir[0]);
                 Logger::log<LOG_DEBUG>("GPIO: port_dir[1]={0}", this->port_dir[1]);

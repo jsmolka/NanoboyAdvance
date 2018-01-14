@@ -22,10 +22,32 @@
 #include "gpio.hpp"
 
 namespace Core {
+
     class RTC : public GPIO {
+    private:
+        enum RTCPort {
+            PORT_SCK = 0,
+            PORT_SIO = 1,
+            PORT_CS  = 2
+        };
+
+        enum RTCCommand {
+            TODO
+        };
+
+        bool chip_select { false };
+
     protected:
         auto readPort() -> std::uint8_t final;
 
         void writePort(std::uint8_t data) final;
+
+    public:
+        using GPIO::GPIO;
+
+        void reset() final {
+            GPIO::reset();
+            this->chip_select = false;
+        }
     };
 }

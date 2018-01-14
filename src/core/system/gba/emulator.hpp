@@ -56,7 +56,7 @@ namespace Core {
     private:
         Config* config;
 
-        GPIO* gpio = new RTC(); // TODO: init nullptr
+        GPIO* gpio = new RTC(regs.irq.flag); // TODO: init nullptr
 
         // Cycles until next PPU phase
         int cycles_left;

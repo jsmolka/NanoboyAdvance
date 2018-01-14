@@ -30,5 +30,13 @@ namespace Core {
 
     void RTC::writePort(std::uint8_t data) {
         Logger::log<LOG_DEBUG>("RTC: write 0x{0:x}", data);
+
+        if (portDirection(PORT_CS) == GPIO::GPIO_DIR_IN) {
+            this->chip_select = data & (1<<PORT_CS);
+        }
+
+        if (!this->chip_select) return;
+
+        Logger::log<LOG_DEBUG>("RTC: chip enabled");
     }
 }
