@@ -21,6 +21,7 @@ set(EMULATOR_SRC
     system/gba/dma/regs.cpp
     system/gba/timer/timer.cpp
     system/gba/timer/regs.cpp
+    system/gba/gpio.cpp
 )
 
 set(EMULATOR_HDR
@@ -31,6 +32,7 @@ set(EMULATOR_HDR
     system/gba/memory/memory.hpp
     system/gba/dma/regs.hpp
     system/gba/timer/regs.hpp
+    system/gba/gpio.hpp
 )
 
 set(CART_SRC

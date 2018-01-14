@@ -23,8 +23,12 @@
 #include "util/integer.hpp"
 
 namespace Core {
-
     struct Config {
+        enum GPIODeviceType {
+            GPIO_NONE,
+            GPIO_RTC
+        };
+
         // Core
         std::string bios_path;
 
@@ -46,6 +50,8 @@ namespace Core {
                 bool master { false };
             } mute;
         } audio;
+
+        GPIODeviceType gpio_dev = GPIO_RTC;
 
         // Misc. Get rid of these.
         int  multiplier   = 1;

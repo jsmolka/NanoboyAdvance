@@ -39,6 +39,8 @@
 #define IS_EEPROM_ACCESS(address) memory.rom.save && cart->type == SAVE_EEPROM &&\
                                   ((~memory.rom.size & 0x02000000) || address >= 0x0DFFFF00)
 
+#define IS_GPIO_ACCESS(address) (gpio != nullptr && (address) >= 0xC4 && (address) <= 0xC8)
+
 auto readBIOS(u32 address) -> u32 {
     if (address >= 0x4000) {
         return 0;
@@ -80,6 +82,9 @@ auto busRead8(u32 address, int flags) -> u8 final {
         case 0xA: case 0xB:
         case 0xC: case 0xD: {
             address &= 0x1FFFFFF;
+            if (IS_GPIO_ACCESS(address) && gpio->isReadable()) {
+                return gpio->read(address);
+            }
             if (address >= memory.rom.size) {
                 return address >> 1;
             }
@@ -135,6 +140,10 @@ auto busRead16(u32 address, int flags) -> u16 final {
         case 0xA: case 0xB:
         case 0xC: {
             address &= 0x1FFFFFF;
+            if (IS_GPIO_ACCESS(address) && gpio->isReadable()) {
+                return  gpio->read(address) |
+                       (gpio->read(address + 1) << 8);
+            }
             if (address >= memory.rom.size) {
                 return address >> 1;
             }
@@ -182,6 +191,12 @@ auto busRead32(u32 address, int flags) -> u32 final {
         case 0xA: case 0xB:
         case 0xC: case 0xD: {
             address &= 0x1FFFFFF;
+            if (IS_GPIO_ACCESS(address) && gpio->isReadable()) {
+                return  gpio->read(address)            |
+                       (gpio->read(address + 1) << 8)  |
+                       (gpio->read(address + 2) << 16) |
+                       (gpio->read(address + 3) << 24);
+            }
             if (address >= memory.rom.size) {
                 return ( (address      >> 1) &  0xFFFF) |
                        (((address + 2) >> 1) << 16    );
@@ -258,13 +273,31 @@ void busWrite16(u32 address, u16 value, int flags) final {
         }
         case 0x7: WRITE_FAST_16(memory.oam, address & 0x3FF, value); break;
 
+        case 0x8: case 0x9:
+        case 0xA: case 0xB:
+        case 0xC: {
+            address &= 0x1FFFFFF;
+            if (IS_GPIO_ACCESS(address)) {
+                gpio->write(address+0, value&0xFF);
+                gpio->write(address+1, value>>8);
+            }
+            break;
+        }
+
         // EEPROM write
         case 0xD: {
-            if (IS_EEPROM_ACCESS(address)) {
+             if (IS_EEPROM_ACCESS(address)) {
                 if (~flags & M_DMA) {
                     break;
                 }
                 memory.rom.save->write8(address, value);
+                break;
+            }
+            address &= 0x1FFFFFF;
+            if (IS_GPIO_ACCESS(address)) {
+                gpio->write(address+0, value&0xFF);
+                gpio->write(address+1, value>>8);
+                break;
             }
             break;
         }
@@ -307,6 +340,21 @@ void busWrite32(u32 address, u32 value, int flags) final {
             break;
         }
         case 0x7: WRITE_FAST_32(memory.oam, address & 0x3FF, value); break;
+
+        case 0x8: case 0x9:
+        case 0xA: case 0xB:
+        case 0xC: case 0xD: {
+            // TODO: check if 32-bit EEPROM accesses are possible.
+            address &= 0x1FFFFFF;
+            if (IS_GPIO_ACCESS(address)) {
+                gpio->write(address+0, (value>>0) &0xFF);
+                gpio->write(address+1, (value>>8) &0xFF);
+                gpio->write(address+2, (value>>16)&0xFF);
+                gpio->write(address+3, (value>>24)&0xFF);
+            }
+            break;
+        }
+
         case 0xE: {
             if (!memory.rom.save || cart->type == SAVE_EEPROM) {
                 break;
