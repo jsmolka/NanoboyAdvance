@@ -38,6 +38,8 @@ namespace Core {
     auto GPIO::read(std::uint32_t address) -> std::uint8_t {
         Logger::log<LOG_DEBUG>("GPIO: read from 0x{0:X}", address);
 
+        if (!this->allow_reads) return 0;
+
         switch (address) {
             case GPIO_DATA: {
                 return readPort() & this->read_mask;

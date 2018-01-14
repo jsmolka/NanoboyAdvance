@@ -35,6 +35,11 @@ namespace Core {
             TODO
         };
 
+        int idx_bit  {0};
+        int idx_byte {0};
+
+        uint8_t byte_reg {0};
+
         bool chip_select { false };
 
     protected:
@@ -47,6 +52,8 @@ namespace Core {
 
         void reset() final {
             GPIO::reset();
+            this->idx_bit  = 0;
+            this->idx_byte = 0;
             this->chip_select = false;
         }
     };
