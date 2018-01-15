@@ -23,6 +23,19 @@
 using namespace Util;
 
 namespace Core {
+    auto RTC::readSIO() -> bool {
+        this->byte_reg |= (this->port.sio << this->idx_bit);
+
+        if (++this->idx_bit == 8) {
+            Logger::log<LOG_DEBUG>("RTC: byte_reg=0x{0:X}", this->byte_reg);
+            this->byte_reg = 0;
+            this->idx_bit  = 0;
+            return true;
+        }
+
+        return false;
+    }
+
     auto RTC::readPort() -> std::uint8_t {
         //Logger::log<LOG_DEBUG>("RTC: read");
         return 0;
@@ -37,55 +50,67 @@ namespace Core {
             Logger::log<LOG_WARN>("RTC: wrong SCK port direction.");
         }
 
-        int old_sck = this->sck;
+        int old_sck = this->port.sck;
+        int old_cs  = this->port.cs;
 
-        int sck = (data>>PORT_SCK)&1;
-        int sio = (data>>PORT_SIO)&1;
-        int cs  = (data>>PORT_CS )&1;
-
-        this->sck = sck;
+        int sck = this->port.sck = (data>>PORT_SCK)&1;
+        int sio = this->port.sio = (data>>PORT_SIO)&1;
+        int cs  = this->port.cs  = (data>>PORT_CS )&1;
 
         Logger::log<LOG_DEBUG>("RTC: sck={0} sio={1} cs={2}", sck, sio, cs);
 
-        bool old_cs = this->chip_select;
+        if (!old_cs &&  cs) {
+            Logger::log<LOG_DEBUG>("RTC: enabled.");
 
-        this->chip_select = cs;
-
-        if (!old_cs &&  cs) Logger::log<LOG_DEBUG>("RTC: enabled.");
+            // Not tested but probably needed.
+            this->state    = WAIT_CMD;
+            this->idx_bit  = 0;
+            this->idx_byte = 0;
+        }
         if ( old_cs && !cs) Logger::log<LOG_DEBUG>("RTC: disbled.");
 
-        if (!this->chip_select) return;
+        if (!cs) return;
 
-        if (sck && !old_sck) {
-            this->byte_reg |= (sio<<this->idx_bit);
-            if (++this->idx_bit == 8) {
-                Logger::log<LOG_DEBUG>("RTC: byte_reg=0x{0:X}", this->byte_reg);
-                this->byte_reg = 0;
-                this->idx_bit  = 0;
+        switch (this->state) {
+            case WAIT_CMD: {
+                // CHECKME: apparently data is accepted on rising clock edge?
+                if (!old_sck && sck) {
+                    bool completed = readSIO();
+
+                    // Wait until the complete CMD byte arrived.
+                    if (!completed) return;
+
+                    uint8_t cmd = 0;
+
+                    // Check for FWD/REV format specifier
+                    /*if ((this->byte_reg & 15) == 6) {
+                        cmd = this->byte_reg;
+                    }
+                    else if ((this->byte_reg >> 4) == 6) {
+                        Logger::log<LOG_DEBUG>("RTC: game uses REV format.");
+                        // Reverse bit pattern.
+                        for (int i = 0; i < 7; i++)
+                            cmd |= ((this->byte_reg>>(i^7))&1)<<i;
+                    }
+                    else {
+                        Logger::log<LOG_WARN>("RTC: undefined state: unknown command format.");
+                        return;
+                    }*/
+                    cmd = this->byte_reg;
+
+                    this->cmd = (cmd>>4)&7;
+
+                    if (cmd & 0x80) {
+                        Logger::log<LOG_DEBUG>("RTC: cmd={0} (read)", this->cmd);
+                        this->state = SENDING;
+                    }
+                    else {
+                        Logger::log<LOG_DEBUG>("RTC: cmd={0} (write)", this->cmd);
+                        this->state = RECEIVING;
+                    }
+                }
+                break;
             }
         }
-
-        /*switch (this->state) {
-            case WAIT_INIT_1: {
-                if (sck == 1 && cs == 0) {
-                    Logger::log<LOG_DEBUG>("RTC: init_1 accepted.");
-                    this->state = WAIT_INIT_2;
-                }
-                else {
-                    Logger::log<LOG_DEBUG>("RTC: init_1 rejected.");
-                }
-                break;
-            }
-            case WAIT_INIT_2: {
-                if (sck == 1 && cs == 1) {
-                    Logger::log<LOG_DEBUG>("RTC: init_2 accepted.");
-                    this->state = WAIT_CMD;
-                }
-                else {
-                    Logger::log<LOG_DEBUG>("RTC: init_2 rejected.");
-                }
-                break;
-            }
-        }*/
     }
 }

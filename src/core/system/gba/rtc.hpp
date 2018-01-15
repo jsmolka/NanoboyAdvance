@@ -32,8 +32,6 @@ namespace Core {
         };
 
         enum RTCState {
-            WAIT_INIT_1,
-            WAIT_INIT_2,
             WAIT_CMD,
             SENDING,
             RECEIVING,
@@ -49,10 +47,17 @@ namespace Core {
 
         uint8_t byte_reg {0};
 
-        int  sck;
-        bool chip_select { false };
+        struct RTCPortData {
+            int sck;
+            int sio;
+            int cs;
+        } port;
 
-        RTCState state { WAIT_INIT_1 };
+        RTCState state { WAIT_CMD };
+
+        int cmd;
+
+        auto readSIO() -> bool;
 
     protected:
         auto readPort() -> std::uint8_t final;
@@ -64,10 +69,10 @@ namespace Core {
 
         void reset() final {
             GPIO::reset();
-            this->state    = WAIT_INIT_1;
-            this->idx_bit  = 0;
-            this->idx_byte = 0;
-            this->chip_select = false;
+            
+            this->port.sck = 0;
+            this->port.sio = 0;
+            this->port.cs  = 0;
         }
     };
 }
