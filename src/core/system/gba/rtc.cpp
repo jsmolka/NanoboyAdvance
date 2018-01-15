@@ -24,11 +24,11 @@ using namespace Util;
 
 namespace Core {
     auto RTC::readSIO() -> bool {
-        this->byte_reg |= (this->port.sio << this->idx_bit);
+        this->byte_reg &= ~(1 << this->idx_bit);
+        this->byte_reg |=  (this->port.sio << this->idx_bit);
 
         if (++this->idx_bit == 8) {
             Logger::log<LOG_DEBUG>("RTC: byte_reg=0x{0:X}", this->byte_reg);
-            this->byte_reg = 0;
             this->idx_bit  = 0;
             return true;
         }
@@ -83,7 +83,7 @@ namespace Core {
                     uint8_t cmd = 0;
 
                     // Check for FWD/REV format specifier
-                    /*if ((this->byte_reg & 15) == 6) {
+                    if ((this->byte_reg & 15) == 6) {
                         cmd = this->byte_reg;
                     }
                     else if ((this->byte_reg >> 4) == 6) {
@@ -95,8 +95,7 @@ namespace Core {
                     else {
                         Logger::log<LOG_WARN>("RTC: undefined state: unknown command format.");
                         return;
-                    }*/
-                    cmd = this->byte_reg;
+                    }
 
                     this->cmd = (cmd>>4)&7;
 
