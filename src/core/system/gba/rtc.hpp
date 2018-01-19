@@ -38,8 +38,8 @@ namespace Core {
             COMPLETE
         };
 
-        enum RTCCommand {
-            TODO
+        enum RTCRegister {
+            CONTROL = 0x4
         };
 
         int idx_bit  {0};
@@ -56,6 +56,7 @@ namespace Core {
         RTCState state { WAIT_CMD };
 
         int cmd;
+        std::uint8_t data[8];
 
         auto readSIO() -> bool;
 
@@ -69,7 +70,7 @@ namespace Core {
 
         void reset() final {
             GPIO::reset();
-            
+
             this->port.sck = 0;
             this->port.sio = 0;
             this->port.cs  = 0;

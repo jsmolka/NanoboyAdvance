@@ -74,7 +74,7 @@ namespace Core {
         switch (this->state) {
             case WAIT_CMD: {
                 // CHECKME: apparently data is accepted on rising clock edge?
-                if (!old_sck && sck) {
+                if (old_sck && !sck) {
                     bool completed = readSIO();
 
                     // Wait until the complete CMD byte arrived.
@@ -98,6 +98,8 @@ namespace Core {
                     }
 
                     this->cmd = (cmd>>4)&7;
+                    this->idx_byte = 0;
+                    this->idx_bit  = 0; // actually not needed?
 
                     if (cmd & 0x80) {
                         Logger::log<LOG_DEBUG>("RTC: cmd={0} (read)", this->cmd);
@@ -107,6 +109,15 @@ namespace Core {
                         Logger::log<LOG_DEBUG>("RTC: cmd={0} (write)", this->cmd);
                         this->state = RECEIVING;
                     }
+                }
+                break;
+            }
+            case SENDING: {
+                break;
+            }
+            case RECEIVING: {
+                if (this->idx_byte < 8) {
+                    //this->data[this->idx_byte]
                 }
                 break;
             }
