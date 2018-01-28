@@ -37,7 +37,9 @@ namespace Core {
     }
 
     auto RTC::readPort() -> std::uint8_t {
-        //Logger::log<LOG_DEBUG>("RTC: read");
+        if (this->state == SENDING) {
+            Logger::log<LOG_DEBUG>("RTC: read");
+        }
         return 0;
     }
 
@@ -67,13 +69,13 @@ namespace Core {
             this->idx_bit  = 0;
             this->idx_byte = 0;
         }
-        if ( old_cs && !cs) Logger::log<LOG_DEBUG>("RTC: disbled.");
+        if ( old_cs && !cs) Logger::log<LOG_DEBUG>("RTC: disabled.");
 
         if (!cs) return;
 
         switch (this->state) {
             case WAIT_CMD: {
-                // CHECKME: apparently data is accepted on rising clock edge?
+                // CHECKME: apparently data is accepted on falling clock edge?
                 if (old_sck && !sck) {
                     bool completed = readSIO();
 
@@ -116,8 +118,21 @@ namespace Core {
                 break;
             }
             case RECEIVING: {
-                if (this->idx_byte < 8) {
-                    //this->data[this->idx_byte]
+                if (old_sck && !sck) {
+                    if (this->idx_byte < 8) {
+                        Logger::log<LOG_DEBUG>("RTC: something");
+                        if (readSIO()) {
+                            Logger::log<LOG_DEBUG>("RTC: received byte {0}", this->idx_byte);
+                            this->data[this->idx_byte++] = this->byte_reg;
+                        }
+                        return;
+                    }
+                    Logger::log<LOG_DEBUG>(
+                        "RTC: cmd_buf(in)=[0x{0:X}, 0x{1:X}, 0x{2:X}, 0x{3:X}, 0x{4:X}, 0x{5:X}, 0x{6:X}, 0x{7:X}]",
+                        this->data[0], this->data[1], this->data[2], this->data[3], 
+                        this->data[4], this->data[5], this->data[6], this->data[7]
+                    );
+                    // TODO: handler
                 }
                 break;
             }
