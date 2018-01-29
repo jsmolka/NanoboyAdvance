@@ -59,6 +59,9 @@ namespace Core {
         std::uint8_t data[8];
 
         auto readSIO() -> bool;
+        void processCommandBit();
+        void readRTC(RTCRegister reg);
+        void writeRTC(RTCRegister reg);
 
     protected:
         auto readPort() -> std::uint8_t final;

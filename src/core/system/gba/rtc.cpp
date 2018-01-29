@@ -84,40 +84,7 @@ namespace Core {
             case WAIT_CMD: {
                 // CHECKME: seems like data should be accepted on rising clock edge.
                 if (!old_sck && sck) {
-                    bool completed = readSIO();
-
-                    // Wait until the complete CMD byte arrived.
-                    if (!completed) return;
-
-                    uint8_t cmd = 0;
-
-                    // Check for FWD/REV format specifier
-                    if ((this->byte_reg & 15) == 6) {
-                        cmd = this->byte_reg;
-                    }
-                    else if ((this->byte_reg >> 4) == 6) {
-                        Logger::log<LOG_DEBUG>("RTC: game uses REV format.");
-                        // Reverse bit pattern.
-                        for (int i = 0; i < 7; i++)
-                            cmd |= ((this->byte_reg>>(i^7))&1)<<i;
-                    }
-                    else {
-                        Logger::log<LOG_WARN>("RTC: undefined state: unknown command format.");
-                        return;
-                    }
-
-                    this->cmd = (cmd>>4)&7;
-                    this->idx_byte = 0;
-                    this->idx_bit  = 0; // actually not needed?
-
-                    if (cmd & 0x80) {
-                        Logger::log<LOG_DEBUG>("RTC: cmd={0} (read)", this->cmd);
-                        this->state = SENDING;
-                    }
-                    else {
-                        Logger::log<LOG_DEBUG>("RTC: cmd={0} (write)", this->cmd);
-                        this->state = RECEIVING;
-                    }
+                    processCommandBit();
                 }
                 break;
             }
@@ -144,10 +111,58 @@ namespace Core {
                         this->data[0], this->data[1], this->data[2], this->data[3], 
                         this->data[4], this->data[5], this->data[6], this->data[7]
                     );
-                    // TODO: handler
+                    writeRTC(static_cast<RTCRegister>(this->cmd));
                 }
                 break;
             }
         }
+    }
+
+    void RTC::processCommandBit() {
+        bool completed = readSIO();
+
+        // Wait until the complete CMD byte arrived.
+        if (!completed) return;
+
+        uint8_t cmd = 0;
+
+        // Check for FWD/REV format specifier
+        if ((this->byte_reg & 15) == 6) {
+            cmd = this->byte_reg;
+        }
+        else if ((this->byte_reg >> 4) == 6) {
+            Logger::log<LOG_DEBUG>("RTC: game uses REV format.");
+            // Reverse bit pattern.
+            for (int i = 0; i < 7; i++)
+                cmd |= ((this->byte_reg>>(i^7))&1)<<i;
+        }
+        else {
+            Logger::log<LOG_WARN>("RTC: undefined state: unknown command format. byte=0x{0:X}", this->byte_reg);
+            return;
+        }
+
+        // Extract RTC register ("cmd") and reset receive indices
+        this->cmd = (cmd>>4)&7;
+        this->idx_byte = 0;
+        this->idx_bit  = 0;
+
+        // cmd[7:] determines if the RTC register is read or written.
+        if (cmd & 0x80) {
+            Logger::log<LOG_DEBUG>("RTC: cmd={0} (read)", this->cmd);
+            readRTC(static_cast<RTCRegister>(this->cmd));
+            this->state = SENDING;
+        }
+        else {
+            Logger::log<LOG_DEBUG>("RTC: cmd={0} (write)", this->cmd);
+            this->state = RECEIVING;
+        }
+    }
+
+    void RTC::readRTC(RTCRegister reg) {
+
+    }
+
+    void RTC::writeRTC(RTCRegister reg) {
+
     }
 }
