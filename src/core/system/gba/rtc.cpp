@@ -38,9 +38,11 @@ namespace Core {
 
     auto RTC::readPort() -> std::uint8_t {
         if (this->state == SENDING) {
-            Logger::log<LOG_DEBUG>("RTC: read");
+            Logger::log<LOG_DEBUG>("RTC: read={0}", this->port.sio);
+            return this->port.sio;
         }
-        return 0;
+        // Ugh tri-state logic, "High-Z". idk.
+        return 1;
     }
 
     void RTC::writePort(std::uint8_t data) {
@@ -55,9 +57,14 @@ namespace Core {
         int old_sck = this->port.sck;
         int old_cs  = this->port.cs;
 
-        int sck = this->port.sck = (data>>PORT_SCK)&1;
-        int sio = this->port.sio = (data>>PORT_SIO)&1;
-        int cs  = this->port.cs  = (data>>PORT_CS )&1;
+        int sck = (data>>PORT_SCK)&1;
+        int sio = (data>>PORT_SIO)&1;
+        int cs  = (data>>PORT_CS )&1;
+
+        // TODO(GPIO): maybe keep track of bit state instead of just passing what was written to the port.
+        if (portDirection(PORT_SCK) == GPIO::GPIO_DIR_OUT) this->port.sck = sck;
+        if (portDirection(PORT_SIO) == GPIO::GPIO_DIR_OUT) this->port.sio = sio;
+        if (portDirection(PORT_CS ) == GPIO::GPIO_DIR_OUT) this->port.cs  = cs;
 
         Logger::log<LOG_DEBUG>("RTC: sck={0} sio={1} cs={2}", sck, sio, cs);
 
@@ -75,8 +82,8 @@ namespace Core {
 
         switch (this->state) {
             case WAIT_CMD: {
-                // CHECKME: apparently data is accepted on falling clock edge?
-                if (old_sck && !sck) {
+                // CHECKME: seems like data should be accepted on rising clock edge.
+                if (!old_sck && sck) {
                     bool completed = readSIO();
 
                     // Wait until the complete CMD byte arrived.
@@ -115,10 +122,15 @@ namespace Core {
                 break;
             }
             case SENDING: {
+                // CHECKME: seems like data should be output on falling clock edge.
+                if (old_sck && !sck) {
+                    this->port.sio ^= 1; // test
+                }
                 break;
             }
             case RECEIVING: {
-                if (old_sck && !sck) {
+                // CHECKME: seems like data should be accepted on rising clock edge.
+                if (!old_sck && sck) {
                     if (this->idx_byte < 8) {
                         Logger::log<LOG_DEBUG>("RTC: something");
                         if (readSIO()) {
