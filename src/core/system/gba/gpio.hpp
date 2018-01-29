@@ -55,10 +55,11 @@ namespace Core {
         GPIO(std::uint16_t& irq_flags) : irq_flags(irq_flags) { }
 
         virtual void reset() {
-            this->port_dir[0] = GPIO_DIR_IN;
-            this->port_dir[1] = GPIO_DIR_IN;
-            this->port_dir[2] = GPIO_DIR_IN;
-            this->port_dir[3] = GPIO_DIR_IN;
+            // TODO: verify these settings
+            this->port_dir[0] = GPIO_DIR_OUT;
+            this->port_dir[1] = GPIO_DIR_OUT;
+            this->port_dir[2] = GPIO_DIR_OUT;
+            this->port_dir[3] = GPIO_DIR_OUT;
 
             updateReadWriteMasks();
         }
