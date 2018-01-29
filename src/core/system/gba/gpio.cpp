@@ -44,7 +44,9 @@ namespace Core {
 
         switch (address) {
             case GPIO_DATA: {
-                return readPort() & this->read_mask;
+                auto value = readPort() & this->read_mask;
+                Logger::log<LOG_DEBUG>("GPIO: read value=0b{0:B}", value);
+                return value;
             }
             case GPIO_DIRECTION: {
                 return this->read_mask;

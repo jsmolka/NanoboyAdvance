@@ -39,7 +39,7 @@ namespace Core {
     auto RTC::readPort() -> std::uint8_t {
         if (this->state == SENDING) {
             Logger::log<LOG_DEBUG>("RTC: read={0}", this->port.sio);
-            return this->port.sio;
+            return this->port.sio << PORT_SIO;
         }
         // Ugh tri-state logic, "High-Z". idk.
         return 1;
