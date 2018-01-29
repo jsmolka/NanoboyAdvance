@@ -51,6 +51,7 @@ namespace Core {
         std::uint8_t read_mask  { 0 };
         std::uint8_t write_mask { 15 };
 
+        std::uint8_t port_data { 0 };
     public:
         GPIO(std::uint16_t& irq_flags) : irq_flags(irq_flags) { }
 
@@ -60,6 +61,8 @@ namespace Core {
             this->port_dir[1] = GPIO_DIR_OUT;
             this->port_dir[2] = GPIO_DIR_OUT;
             this->port_dir[3] = GPIO_DIR_OUT;
+
+            this->port_data = 0;
 
             updateReadWriteMasks();
         }

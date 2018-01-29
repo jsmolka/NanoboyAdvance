@@ -45,7 +45,12 @@ namespace Core {
         switch (address) {
             case GPIO_DATA: {
                 auto value = readPort() & this->read_mask;
-                Logger::log<LOG_DEBUG>("GPIO: read value=0b{0:B}", value);
+
+                this->port_data &= ~(this->read_mask);
+                this->port_data |= value;
+                
+                // CHECKME: I suspect writable bits are low or floating when being read but
+                // are not actually readable? Currently we just return 0 for those bits.
                 return value;
             }
             case GPIO_DIRECTION: {
@@ -64,7 +69,9 @@ namespace Core {
 
         switch (address) {
             case GPIO_DATA: {
-                writePort(value & this->write_mask);
+                this->port_data &= ~(this->write_mask);
+                this->port_data |=   this->write_mask & value;
+                writePort(this->port_data);
                 break;
             }
             case GPIO_DIRECTION: {

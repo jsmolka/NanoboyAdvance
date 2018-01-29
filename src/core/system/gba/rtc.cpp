@@ -61,12 +61,12 @@ namespace Core {
         int sio = (data>>PORT_SIO)&1;
         int cs  = (data>>PORT_CS )&1;
 
-        // TODO(GPIO): maybe keep track of bit state instead of just passing what was written to the port.
+        // Update port status accordingly
         if (portDirection(PORT_SCK) == GPIO::GPIO_DIR_OUT) this->port.sck = sck;
         if (portDirection(PORT_SIO) == GPIO::GPIO_DIR_OUT) this->port.sio = sio;
         if (portDirection(PORT_CS ) == GPIO::GPIO_DIR_OUT) this->port.cs  = cs;
 
-        Logger::log<LOG_DEBUG>("RTC: sck={0} sio={1} cs={2}", sck, sio, cs);
+        Logger::log<LOG_DEBUG>("RTC: sck={0} sio={1} cs={2}", this->port.sck, this->port.sio, this->port.cs);
 
         if (!old_cs &&  cs) {
             Logger::log<LOG_DEBUG>("RTC: enabled.");
