@@ -91,7 +91,14 @@ namespace Core {
             case SENDING: {
                 // CHECKME: seems like data should be output on falling clock edge.
                 if (old_sck && !sck) {
-                    this->port.sio ^= 1; // test
+                    this->port.sio = this->data[this->idx_byte] & 1;
+                    this->data[this->idx_byte] >>= 1;
+
+                    if (++this->idx_bit == 8) {
+                        this->idx_bit = 0;
+                        this->idx_byte++;
+                    }
+                    //this->port.sio ^= 1; // test
                 }
                 break;
             }
@@ -159,7 +166,27 @@ namespace Core {
     }
 
     void RTC::readRTC(RTCRegister reg) {
-
+        switch (reg) {
+            case CONTROL: {
+                this->data[0] = (this->control.unknown    ? 2   : 0) |
+                                (this->control.minute_irq ? 8   : 0) |
+                                (this->control.mode_24h   ? 64  : 0) |
+                                (this->control.power_off  ? 128 : 0);
+                Logger::log<LOG_DEBUG>("RTC: read: control=[0x{0:X}]", this->data[0]);
+                break;
+            }
+            case DATETIME: {
+                // Test
+                this->data[0] = 0x18; // year
+                this->data[1] = 0x01; // month
+                this->data[2] = 0x30; // day
+                this->data[3] = 0x00; // day of week
+                this->data[4] = 0x06; // hour | (pm << 6)
+                this->data[5] = 0x30; // minute
+                this->data[6] = 0x30; // minute again?
+                break;
+            }
+        }
     }
 
     void RTC::writeRTC(RTCRegister reg) {

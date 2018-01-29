@@ -39,7 +39,9 @@ namespace Core {
         };
 
         enum RTCRegister {
-            CONTROL = 0x4
+            FORCE_RESET = 0,
+            DATETIME    = 0x2,
+            CONTROL     = 0x4
         };
 
         int idx_bit  {0};
@@ -58,6 +60,13 @@ namespace Core {
         int cmd;
         std::uint8_t data[8];
 
+        struct RTCCommandRegister {
+            bool unknown;
+            bool minute_irq;
+            bool mode_24h;
+            bool power_off;
+        } control;
+
         auto readSIO() -> bool;
         void processCommandBit();
         void readRTC(RTCRegister reg);
@@ -74,9 +83,16 @@ namespace Core {
         void reset() final {
             GPIO::reset();
 
+            // Reset cached port state.
             this->port.sck = 0;
             this->port.sio = 0;
             this->port.cs  = 0;
+
+            // Reset control register.
+            this->control.unknown    = false;
+            this->control.minute_irq = false;
+            this->control.mode_24h   = false;
+            this->control.power_off  = false;
         }
     };
 }
