@@ -23,6 +23,8 @@
 using namespace Util;
 
 namespace Core {
+    constexpr int RTC::s_num_params[8];
+
     auto RTC::readSIO() -> bool {
         this->byte_reg &= ~(1 << this->idx_bit);
         this->byte_reg |=  (this->port.sio << this->idx_bit);
@@ -96,16 +98,18 @@ namespace Core {
 
                     if (++this->idx_bit == 8) {
                         this->idx_bit = 0;
-                        this->idx_byte++;
+                        if (++this->idx_byte >= s_num_params[this->cmd]) {
+                            // TODO: check docs, if chip really accepts another command.
+                            this->state = WAIT_CMD;
+                        }
                     }
-                    //this->port.sio ^= 1; // test
                 }
                 break;
             }
             case RECEIVING: {
                 // CHECKME: seems like data should be accepted on rising clock edge.
                 if (!old_sck && sck) {
-                    if (this->idx_byte < 8) {
+                    if (this->idx_byte < s_num_params[this->cmd]) {
                         Logger::log<LOG_DEBUG>("RTC: something");
                         if (readSIO()) {
                             Logger::log<LOG_DEBUG>("RTC: received byte {0}", this->idx_byte);
@@ -114,11 +118,14 @@ namespace Core {
                         return;
                     }
                     Logger::log<LOG_DEBUG>(
-                        "RTC: cmd_buf(in)=[0x{0:X}, 0x{1:X}, 0x{2:X}, 0x{3:X}, 0x{4:X}, 0x{5:X}, 0x{6:X}, 0x{7:X}]",
+                        "RTC: cmd_buf(in)=[0x{0:X}, 0x{1:X}, 0x{2:X}, 0x{3:X}, 0x{4:X}, 0x{5:X}, 0x{6:X}]",
                         this->data[0], this->data[1], this->data[2], this->data[3], 
-                        this->data[4], this->data[5], this->data[6], this->data[7]
+                        this->data[4], this->data[5], this->data[6]
                     );
                     writeRTC(static_cast<RTCRegister>(this->cmd));
+                    
+                    // TODO: check docs, if chip really accepts another command.
+                    this->state = WAIT_CMD;
                 }
                 break;
             }

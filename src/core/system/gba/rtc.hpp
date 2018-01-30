@@ -41,7 +41,10 @@ namespace Core {
         enum RTCRegister {
             FORCE_RESET = 0,
             DATETIME    = 0x2,
-            CONTROL     = 0x4
+            FORCE_IRQ   = 0x3,
+            CONTROL     = 0x4,
+            TIME        = 0x6,
+            FREE_REG    = 0x7
         };
 
         int idx_bit  {0};
@@ -58,7 +61,7 @@ namespace Core {
         RTCState state { WAIT_CMD };
 
         int cmd;
-        std::uint8_t data[8];
+        std::uint8_t data[7]; // exchange buffer
 
         struct RTCCommandRegister {
             bool unknown;
@@ -71,6 +74,18 @@ namespace Core {
         void processCommandBit();
         void readRTC(RTCRegister reg);
         void writeRTC(RTCRegister reg);
+
+        // LUT for command parameter count.
+        static constexpr int s_num_params[8] = {
+            1, // FORCE_RESET
+            0, // UNUSED?
+            7, // DATETIME,
+            1, // FORCE_IRQ
+            1, // CONTROL,
+            3, // UNUSED?
+            3, // TIME
+            1  // FREE_REG
+        };
 
     protected:
         auto readPort() -> std::uint8_t final;
