@@ -166,12 +166,26 @@ namespace Core {
         // cmd[7:] determines if the RTC register is read or written.
         if (cmd & 0x80) {
             Logger::log<LOG_DEBUG>("RTC: cmd={0} (read)", this->cmd);
+
             readRTC(static_cast<RTCRegister>(this->cmd));
-            this->state = SENDING;
+            
+            if (s_num_params[this->cmd] > 0) {
+                this->state = SENDING;
+            }
+            else {
+                this->state = WAIT_CMD;
+            }
         }
         else {
             Logger::log<LOG_DEBUG>("RTC: cmd={0} (write)", this->cmd);
-            this->state = RECEIVING;
+            
+            if (s_num_params[this->cmd] > 0) {
+                this->state = RECEIVING;
+                writeRTC(static_cast<RTCRegister>(this->cmd));
+            }
+            else {
+                this->state = WAIT_CMD;
+            }
         }
     }
 
@@ -191,10 +205,13 @@ namespace Core {
                 this->data[1] = 0x01; // month
                 this->data[2] = 0x30; // day
                 this->data[3] = 0x00; // day of week
-                this->data[4] = 0x06; // hour | (pm << 6)
+                this->data[4] = 0x06; // hour | (pm << 7)
                 this->data[5] = 0x30; // minute
                 this->data[6] = 0x30; // minute again?
                 break;
+            }
+            default: {
+                Logger::log<LOG_DEBUG>("RTC: read: unhandled register=0x{0:X}", reg);
             }
         }
     }
@@ -209,7 +226,13 @@ namespace Core {
                 this->control.mode_24h   = value & 64;
 
                 Logger::log<LOG_DEBUG>("RTC: write: control=[0x{0:X}]", value);
+
+                if (this->control.minute_irq) Logger::log<LOG_WARN>("RTC: write: minute IRQ enabled!!");
+
                 break;
+            }
+            default: {
+                Logger::log<LOG_DEBUG>("RTC: write: unhandled register=0x{0:X}", reg);
             }
         }
     }
