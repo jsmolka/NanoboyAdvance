@@ -30,7 +30,7 @@ namespace Core {
         this->byte_reg |=  (this->port.sio << this->idx_bit);
 
         if (++this->idx_bit == 8) {
-            Logger::log<LOG_DEBUG>("RTC: byte_reg=0x{0:X}", this->byte_reg);
+            //Logger::log<LOG_DEBUG>("RTC: byte_reg=0x{0:X}", this->byte_reg);
             this->idx_bit  = 0;
             return true;
         }
@@ -40,7 +40,7 @@ namespace Core {
 
     auto RTC::readPort() -> std::uint8_t {
         if (this->state == SENDING) {
-            Logger::log<LOG_DEBUG>("RTC: read={0}", this->port.sio);
+            //Logger::log<LOG_DEBUG>("RTC: read={0}", this->port.sio);
             return this->port.sio << PORT_SIO;
         }
         // Ugh tri-state logic, "High-Z". idk.
@@ -68,7 +68,7 @@ namespace Core {
         if (portDirection(PORT_SIO) == GPIO::GPIO_DIR_OUT) this->port.sio = sio;
         if (portDirection(PORT_CS ) == GPIO::GPIO_DIR_OUT) this->port.cs  = cs;
 
-        Logger::log<LOG_DEBUG>("RTC: sck={0} sio={1} cs={2}", this->port.sck, this->port.sio, this->port.cs);
+        //Logger::log<LOG_DEBUG>("RTC: sck={0} sio={1} cs={2}", this->port.sck, this->port.sio, this->port.cs);
 
         if (!old_cs &&  cs) {
             Logger::log<LOG_DEBUG>("RTC: enabled.");
@@ -112,7 +112,7 @@ namespace Core {
                     // Receive bytes until all required params have been received.
                     if (this->idx_byte < s_num_params[this->cmd]) {
                         if (readSIO()) {
-                            Logger::log<LOG_DEBUG>("RTC: received byte {0}", this->idx_byte);
+                            //Logger::log<LOG_DEBUG>("RTC: received byte {0}", this->idx_byte);
                             this->data[this->idx_byte++] = this->byte_reg;
                         }
                     }
@@ -200,6 +200,17 @@ namespace Core {
     }
 
     void RTC::writeRTC(RTCRegister reg) {
+        switch (reg) {
+            case CONTROL: {
+                auto value = this->data[0];
 
+                this->control.unknown    = value & 2;
+                this->control.minute_irq = value & 8 ;
+                this->control.mode_24h   = value & 64;
+
+                Logger::log<LOG_DEBUG>("RTC: write: control=[0x{0:X}]", value);
+                break;
+            }
+        }
     }
 }
