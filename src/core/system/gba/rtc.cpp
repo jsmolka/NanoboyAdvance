@@ -109,23 +109,26 @@ namespace Core {
             case RECEIVING: {
                 // CHECKME: seems like data should be accepted on rising clock edge.
                 if (!old_sck && sck) {
+                    // Receive bytes until all required params have been received.
                     if (this->idx_byte < s_num_params[this->cmd]) {
-                        Logger::log<LOG_DEBUG>("RTC: something");
                         if (readSIO()) {
                             Logger::log<LOG_DEBUG>("RTC: received byte {0}", this->idx_byte);
                             this->data[this->idx_byte++] = this->byte_reg;
                         }
-                        return;
                     }
-                    Logger::log<LOG_DEBUG>(
-                        "RTC: cmd_buf(in)=[0x{0:X}, 0x{1:X}, 0x{2:X}, 0x{3:X}, 0x{4:X}, 0x{5:X}, 0x{6:X}]",
-                        this->data[0], this->data[1], this->data[2], this->data[3], 
-                        this->data[4], this->data[5], this->data[6]
-                    );
-                    writeRTC(static_cast<RTCRegister>(this->cmd));
-                    
-                    // TODO: check docs, if chip really accepts another command.
-                    this->state = WAIT_CMD;
+                    // Need to recheck if all bytes have been received, as idx_byte is modified above.
+                    if (this->idx_byte == s_num_params[this->cmd]) {
+                        // In that case finally dispatch the command.
+                        Logger::log<LOG_DEBUG>(
+                            "RTC: cmd_buf(in)=[0x{0:X}, 0x{1:X}, 0x{2:X}, 0x{3:X}, 0x{4:X}, 0x{5:X}, 0x{6:X}]",
+                            this->data[0], this->data[1], this->data[2], this->data[3], 
+                            this->data[4], this->data[5], this->data[6]
+                        );
+                        writeRTC(static_cast<RTCRegister>(this->cmd));
+                        
+                        // TODO: check docs, if chip really accepts another command.
+                        this->state = WAIT_CMD;
+                    }
                 }
                 break;
             }
