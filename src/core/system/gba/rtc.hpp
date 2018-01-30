@@ -70,6 +70,17 @@ namespace Core {
             bool power_off;
         } control;
 
+        // Values are purely for testing.
+        struct RTCDateTimeRegister {
+            std::uint8_t year   { 0x18 };
+            std::uint8_t month  { 0x01 };
+            std::uint8_t day    { 0x30 };
+            std::uint8_t day_of_week { 1 };
+            std::uint8_t hour   { 0x15 }; // bit 7 is am/pm flag.
+            std::uint8_t minute { 0x30 };
+            std::uint8_t second { 0x30 };
+        } datetime;
+
         auto readSIO() -> bool;
         void processCommandBit();
         void readRTC(RTCRegister reg);

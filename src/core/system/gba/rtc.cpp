@@ -200,14 +200,28 @@ namespace Core {
                 break;
             }
             case DATETIME: {
-                // Test
-                this->data[0] = 0x18; // year
-                this->data[1] = 0x01; // month
-                this->data[2] = 0x30; // day
-                this->data[3] = 0x00; // day of week
-                this->data[4] = 0x06; // hour | (pm << 7)
-                this->data[5] = 0x30; // minute
-                this->data[6] = 0x30; // minute again?
+                this->data[0] = datetime.year;
+                this->data[1] = datetime.month;
+                this->data[2] = datetime.day;
+                this->data[3] = datetime.day_of_week;
+                this->data[4] = datetime.hour;
+                this->data[5] = datetime.minute;
+                this->data[6] = datetime.second;
+                Logger::log<LOG_DEBUG>(
+                    "RTC: read: datetime=[0x{0:X}, 0x{1:X}, 0x{2:X}, 0x{3:X}, 0x{4:X}, 0x{5:X}, 0x{6:X}]",
+                    this->data[0], this->data[1], this->data[2], this->data[3], 
+                    this->data[4], this->data[5], this->data[6]
+                );
+                break;
+            }
+            case TIME: {
+                this->data[0] = datetime.hour;
+                this->data[1] = datetime.minute;
+                this->data[2] = datetime.second;
+                Logger::log<LOG_DEBUG>(
+                    "RTC: read: time=[0x{0:X}, 0x{1:X}, 0x{2:X}]",
+                    this->data[0], this->data[1], this->data[2]
+                );
                 break;
             }
             default: {
