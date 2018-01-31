@@ -65,7 +65,7 @@ namespace Core {
     }
 
     void GPIO::write(std::uint32_t address, std::uint8_t value) {
-        Logger::log<LOG_DEBUG>("GPIO: write to 0x{0:X} = 0x{1:X}", address, value);
+        Logger::log<LOG_DEBUG>("GPIO: write to 0x{0:X} = 0b{1:B}", address, value);
 
         switch (address) {
             case GPIO_DATA: {
@@ -75,6 +75,7 @@ namespace Core {
                 break;
             }
             case GPIO_DIRECTION: {
+                // TODO: interdpth RTC seems to setup SIO port direction up incorrectly.
                 this->port_dir[0] = static_cast<IOPortDirection>((value>>0)&1);
                 this->port_dir[1] = static_cast<IOPortDirection>((value>>1)&1);
                 this->port_dir[2] = static_cast<IOPortDirection>((value>>2)&1);
