@@ -181,9 +181,9 @@ namespace Core {
             
             if (s_num_params[this->cmd] > 0) {
                 this->state = RECEIVING;
-                writeRTC(static_cast<RTCRegister>(this->cmd));
             }
             else {
+                writeRTC(static_cast<RTCRegister>(this->cmd));
                 this->state = WAIT_CMD;
             }
         }
@@ -243,6 +243,19 @@ namespace Core {
 
                 if (this->control.minute_irq) Logger::log<LOG_WARN>("RTC: write: minute IRQ enabled!!");
 
+                break;
+            }
+            case FORCE_RESET: {
+                this->control.reset();
+                this->datetime.reset();
+
+                Logger::log<LOG_DEBUG>("RTC: write: forced reset");
+                break;
+            }
+            case FORCE_IRQ: {
+                sendIRQ();
+
+                Logger::log<LOG_DEBUG>("RTC: write: forced IRQ");
                 break;
             }
             default: {

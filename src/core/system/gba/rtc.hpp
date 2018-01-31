@@ -68,6 +68,13 @@ namespace Core {
             bool minute_irq;
             bool mode_24h;
             bool power_off;
+
+            void reset() {
+                this->unknown    = false;
+                this->minute_irq = false;
+                this->mode_24h   = false;
+                this->power_off  = false;
+            }
         } control;
 
         // Values are purely for testing.
@@ -79,6 +86,16 @@ namespace Core {
             std::uint8_t hour   { 0x15 }; // bit 7 is am/pm flag.
             std::uint8_t minute { 0x30 };
             std::uint8_t second { 0x30 };
+        
+            void reset() {
+                this->year  = 0;
+                this->month = 1;
+                this->day   = 1;
+                this->day_of_week = 0;
+                this->hour   = 0;
+                this->minute = 0;
+                this->second = 0;
+            }
         } datetime;
 
         auto readSIO() -> bool;
@@ -88,14 +105,14 @@ namespace Core {
 
         // LUT for command parameter count.
         static constexpr int s_num_params[8] = {
-            1, // FORCE_RESET
+            0, // FORCE_RESET
             0, // UNUSED?
             7, // DATETIME,
-            1, // FORCE_IRQ
+            0, // FORCE_IRQ
             1, // CONTROL,
-            3, // UNUSED?
+            0, // UNUSED?
             3, // TIME
-            1  // FREE_REG
+            0  // FREE_REG
         };
 
     protected:
@@ -114,11 +131,8 @@ namespace Core {
             this->port.sio = 0;
             this->port.cs  = 0;
 
-            // Reset control register.
-            this->control.unknown    = false;
-            this->control.minute_irq = false;
-            this->control.mode_24h   = false;
-            this->control.power_off  = false;
+            this->control.reset();
+            this->datetime.reset();
         }
     };
 }
