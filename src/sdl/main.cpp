@@ -19,7 +19,13 @@
 
 #include <string>
 #include <iostream>
+
+#ifdef _MSC_VER
+#include "SDL.h"
+#else
 #include <SDL2/SDL.h>
+#endif
+
 #include "core/system/gba/emulator.hpp"
 #include "util/file.hpp"
 #include "util/ini.hpp"
