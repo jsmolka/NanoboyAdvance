@@ -22,7 +22,11 @@
 #include <QApplication>
 #include <QKeyEvent>
 
+#ifdef _MSC_VER
+#include "SDL.h"
+#else
 #include <SDL2/SDL.h>
+#endif
 
 #include "mainwindow.hpp"
 #include "settings.hpp"
