@@ -91,26 +91,6 @@ inline void ARM::updateCarryFlag(bool carry) {
     }
 }
 
-inline void ARM::updateOverflowFlagAdd(u32 result, u32 operand1, u32 operand2) {
-    bool overflow = !XOR_BIT_31(operand1, operand2) && XOR_BIT_31(result, operand2);
-
-    if (overflow) {
-        ctx.cpsr |= MASK_VFLAG;
-    } else {
-        ctx.cpsr &= ~MASK_VFLAG;
-    }
-}
-
-inline void ARM::updateOverflowFlagSub(u32 result, u32 operand1, u32 operand2) {
-    bool overflow = XOR_BIT_31(operand1, operand2) && !XOR_BIT_31(result, operand2);
-
-    if (overflow) {
-        ctx.cpsr |= MASK_VFLAG;
-    } else {
-        ctx.cpsr &= ~MASK_VFLAG;
-    }
-}
-
 inline void ARM::refillPipeline() {
     if (ctx.cpsr & MASK_THUMB) {
         ctx.pipe[0] = busRead16(ctx.r15,     M_NONSEQ);

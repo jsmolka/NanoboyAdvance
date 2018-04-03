@@ -221,8 +221,6 @@ namespace Core {
         void updateSignFlag(u32 result);
         void updateZeroFlag(u64 result);
         void updateCarryFlag(bool carry);
-        void updateOverflowFlagAdd(u32 result, u32 operand1, u32 operand2);
-        void updateOverflowFlagSub(u32 result, u32 operand1, u32 operand2);
 
         // Data Processing
         auto opDataProc(u32 result, bool set_nz, bool set_c = false, bool carry = false) -> u32;
