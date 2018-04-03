@@ -76,7 +76,7 @@ set(APU_SRC
 set(APU_HDR
     system/gba/apu/apu.hpp
     system/gba/apu/fifo.hpp
-    system/gba/apu/io.hpp
+    system/gba/apu/io.inl
 )
 
 set(SOURCES

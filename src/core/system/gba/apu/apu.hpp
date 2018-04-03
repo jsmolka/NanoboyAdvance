@@ -27,16 +27,19 @@ namespace Core {
 
     class APU {
     private:
-
-        #include "io.hpp"
+        // APU IO interface
+        #include "io.inl"
 
         static constexpr float s_wave_duty[4] = { 0.125, 0.25, 0.5, 0.75 };
+        
         static constexpr int s_sweep_clock[8] = {
             0, 130884, 261768, 392652, 523536, 654420, 785304, 916188
         };
+        
         static constexpr int s_envelope_clock[8] = {
             0, 262187, 524375, 786562, 1048750, 1310937, 1573125, 1835312
         };
+        
         static constexpr float s_psg_volume[] = { 0.25, 0.5, 1, 1 };
         static constexpr float s_dma_volume[] = { 2, 4 };
         static constexpr float s_wav_volume[] = { 0, 1, 0.5, 0.25 };
@@ -46,11 +49,11 @@ namespace Core {
 
         // Stereo output (ring buffers)
         u16 ringbuffers[2][0x4000];
-        int read_pos  { 0 };
-        int write_pos { 0 };
+        int read_pos  = 0;
+        int write_pos = 0;
 
-        int sample_rate    { 44100 };
-        int cycles_elapsed { 0 };
+        int sample_rate    = 44100;
+        int cycles_elapsed = 0;
 
         Config* m_config;
 
@@ -60,9 +63,7 @@ namespace Core {
         void reset();
         void reloadConfig();
 
-        IO& getIO() {
-            return regs;
-        }
+        auto getIO() -> IO& { return regs; }
 
         // Convert GBA frequency to real freq.
         static auto convertFrequency(int freq) -> float;

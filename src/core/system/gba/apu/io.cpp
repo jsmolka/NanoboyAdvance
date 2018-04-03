@@ -20,7 +20,6 @@
 #include "apu.hpp"
 
 namespace Core {
-
     void APU::IO::ToneChannel::reset() {
         // reset sweep info
         sweep.time = 0;
