@@ -22,8 +22,6 @@
 #define N_FLAG (ctx.cpsr & MASK_NFLAG)
 #define V_FLAG (ctx.cpsr & MASK_VFLAG)
 
-#define XOR_BIT_31(a, b) (((a) ^ (b)) >> 31)
-
 inline void ARM::step() {
     auto& pipe = ctx.pipe;
 

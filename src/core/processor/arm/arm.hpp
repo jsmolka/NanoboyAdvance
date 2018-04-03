@@ -183,14 +183,14 @@ namespace Core {
         virtual void busInternalCycles(int count) {}
 
         // System Read Methods
-        virtual auto busRead8 (u32 address, int flags) -> u8  { return 0; }
-        virtual auto busRead16(u32 address, int flags) -> u16 { return 0; }
-        virtual auto busRead32(u32 address, int flags) -> u32 { return 0; }
+        virtual auto busRead8 (u32 address, int flags) -> u8  = 0;
+        virtual auto busRead16(u32 address, int flags) -> u16 = 0;
+        virtual auto busRead32(u32 address, int flags) -> u32 = 0;
 
         // System Write Methods
-        virtual void busWrite8 (u32 address, u8 value,  int flags) {}
-        virtual void busWrite16(u32 address, u16 value, int flags) {}
-        virtual void busWrite32(u32 address, u32 value, int flags) {}
+        virtual void busWrite8 (u32 address, u8 value,  int flags) = 0;
+        virtual void busWrite16(u32 address, u16 value, int flags) = 0;
+        virtual void busWrite32(u32 address, u32 value, int flags) = 0;
 
         // Internal Read Helpers
         auto read8 (u32 address, int flags) -> u32;
@@ -209,7 +209,6 @@ namespace Core {
         virtual void handleSWI(int number) {}
 
     private:
-
         bool fake_swi;
 
         Context ctx;
