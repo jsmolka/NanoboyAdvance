@@ -467,7 +467,6 @@ namespace Core {
 
         // TODO: - emulate empty register list
         //       - figure proper timings & access orders.
-
         if (pop) {
             for (int reg = 0; reg <= 7; reg++) {
                 if (instruction & (1<<reg)) {
@@ -506,25 +505,26 @@ namespace Core {
         ADVANCE_PC;
     }
 
-    // TODO: could use some optimizations :S
     template <bool load, int base>
     void ARM::thumbInst15(u16 instruction) {
         // THUMB.15 Multiple load/store
-#if 0
-        // TODO: verify on hardware
+        
+        // Handle empty register list special case.
         if ((instruction & 0xFF) == 0) {
             PREFETCH_T(M_SEQ);
+            
+            u32 address = ctx.reg[base];
+            
             ctx.reg[base] += 0x40;
             if (load) {
-                ctx.r15 = read32(address, M_NONE); // check access type
+                ctx.r15 = read32(address, M_NONE);
                 REFILL_PIPELINE_T;
             } else {
-                write32(address, ctx.r15, M_NONE); // check access type
+                write32(address, ctx.r15, M_NONE);
                 ADVANCE_PC;
             }
             return;
         }
-#endif
 
         if (load) {
             u32 address = ctx.reg[base];
@@ -560,26 +560,6 @@ namespace Core {
                     ctx.reg[base] += 4;
                 }
             }
-
-            /*for (int i = 0; i <= 7; i++) {
-                if (instruction & (1<<i)) {
-                    int access_type = M_SEQ; // ewww
-
-                    if (first_register == -1) {
-                        first_register = i;
-                        access_type = M_NONSEQ;
-                    }
-
-                    //if (i == base && i == first_register) {
-                    //    write32(ctx.reg[base], address, access_type);
-                    //} else {
-                    //    write32(ctx.reg[base], ctx.reg[i], access_type);
-                    //}
-                    write32(ctx.reg[base], ctx.reg[i], access_type);
-
-                    ctx.reg[base] += 4;
-                }
-            }*/
         }
 
         ADVANCE_PC;
