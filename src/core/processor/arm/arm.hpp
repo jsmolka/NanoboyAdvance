@@ -240,11 +240,12 @@ namespace Core {
         static Bank modeToBank(Mode mode);
 
         // ARM and THUMB interpreter cores
-        #include "instr_arm.hpp"
-        #include "instr_thumb.hpp"
+        #include "instr-arm.hpp"
+        #include "instr-thumb.hpp"
     };
 
-    #include "alu.hpp"
-    #include "inline_code.hpp"
-    #include "memory.hpp"
+    // Inline implementations
+    #include "arm.inl"
+    #include "arithmetic.inl"
+    #include "bus.inl"
 }

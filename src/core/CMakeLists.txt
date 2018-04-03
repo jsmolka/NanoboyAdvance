@@ -1,17 +1,17 @@
 
 set(ARM_SRC
     processor/arm/arm.cpp
-    processor/arm/instr_arm.cpp
-    processor/arm/instr_thumb.cpp
+    processor/arm/instr-arm.cpp
+    processor/arm/instr-thumb.cpp
 )
 
 set(ARM_HDR
     processor/arm/arm.hpp
-    processor/arm/alu.hpp
-    processor/arm/inline_code.hpp
-    processor/arm/instr_arm.hpp
-    processor/arm/instr_thumb.hpp
-    processor/arm/memory.hpp
+    processor/arm/arm.inl
+    processor/arm/arithmetic.inl
+    processor/arm/bus.inl
+    processor/arm/instr-arm.hpp
+    processor/arm/instr-thumb.hpp
 )
 
 set(EMULATOR_SRC
