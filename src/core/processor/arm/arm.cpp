@@ -52,14 +52,14 @@ namespace Core {
     // Based on mGBA (endrift's) approach to banking.
     // https://github.com/mgba-emu/mgba/blob/master/src/arm/arm.c
     void ARM::switchMode(ARM::Mode new_mode) {
-        ARM::Mode old_mode = static_cast<Mode>(ctx.cpsr & MASK_MODE);
+        auto old_mode = static_cast<Mode>(ctx.cpsr & MASK_MODE);
 
         if (new_mode == old_mode) {
             return;
         }
 
-        ARM::Bank new_bank = modeToBank(new_mode);
-        ARM::Bank old_bank = modeToBank(old_mode);
+        auto new_bank = modeToBank(new_mode);
+        auto old_bank = modeToBank(old_mode);
 
         if (new_bank != old_bank) {
             if (new_bank == BANK_FIQ || old_bank == BANK_FIQ) {
@@ -96,22 +96,32 @@ namespace Core {
     }
 
     void ARM::signalIRQ() {
-        if (~ctx.cpsr & MASK_IRQD) {
-            bool thumb = ctx.cpsr & MASK_THUMB;
+        if (ctx.cpsr & MASK_IRQD) {
+            return;
+        }
 
+        if (ctx.cpsr & MASK_THUMB) {
             // store return address in r14<irq>
-            ctx.bank[BANK_IRQ][BANK_R14] = ctx.r15 - (thumb ? 4 : 8) + 4;
+            ctx.bank[BANK_IRQ][BANK_R14] = ctx.r15;
 
             // save program status and switch mode
             ctx.spsr[SPSR_IRQ] = ctx.cpsr;
             switchMode(MODE_IRQ);
             ctx.cpsr = (ctx.cpsr & ~MASK_THUMB) | MASK_IRQD;
+        } else {
+            // store return address in r14<irq>
+            ctx.bank[BANK_IRQ][BANK_R14] = ctx.r15 - 4;
 
-            // jump to exception vector
-            ctx.r15 = EXCPT_INTERRUPT;
-            ctx.pipe[0] = read32(ctx.r15    , M_NONSEQ);
-            ctx.pipe[1] = read32(ctx.r15 + 4, M_SEQ);
-            ctx.r15 += 8;
+            // save program status and switch mode
+            ctx.spsr[SPSR_IRQ] = ctx.cpsr;
+            switchMode(MODE_IRQ);
+            ctx.cpsr |= MASK_IRQD;
         }
+
+        // jump to exception vector
+        ctx.r15 = EXCPT_INTERRUPT;
+        ctx.pipe[0] = read32(ctx.r15    , M_NONSEQ);
+        ctx.pipe[1] = read32(ctx.r15 + 4, M_SEQ);
+        ctx.r15 += 8;
     }
 }
