@@ -24,10 +24,10 @@
 
 namespace Core {
     struct Config {
-        enum GPIODeviceType {
+        /*enum GPIODeviceType {
             GPIO_NONE,
             GPIO_RTC
-        };
+        };*/
 
         // Core
         std::string bios_path;
@@ -36,8 +36,8 @@ namespace Core {
         int  frameskip     = 0;
         bool darken_screen = false;
 
-        // Rendering buffer
-        u32* framebuffer   = nullptr;
+        // Video output buffer
+        u32* framebuffer = nullptr;
 
         struct Audio {
             int sample_rate;
@@ -51,7 +51,7 @@ namespace Core {
             } mute;
         } audio;
 
-        GPIODeviceType gpio_dev = GPIO_RTC;
+        //GPIODeviceType gpio_dev = GPIO_NONE;
 
         // Misc. Get rid of these.
         int  multiplier   = 1;

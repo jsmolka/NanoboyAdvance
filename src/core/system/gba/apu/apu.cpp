@@ -77,8 +77,7 @@ namespace Core {
         auto& cycles   = internal.cycles;
 
         if (channel.apply_length) {
-            int max_cycles = (64 - channel.sound_length) * (1.0 / 256.0) * 16780000;
-
+            int max_cycles = (64 - channel.sound_length) * (16780000 / 256);
             if (cycles.length >= max_cycles) {
                 return 0;
             }
@@ -114,7 +113,7 @@ namespace Core {
         }
 
         if (wave.apply_length) {
-            int max_cycles = (256 - wave.sound_length) * (1.0 / 256.0) * 16780000;
+            int max_cycles = (256 - wave.sound_length) * (16780000 / 256);
 
             if (wave_int.length_cycles >= max_cycles) {
                 return 0;
@@ -134,7 +133,7 @@ namespace Core {
         auto& noise_int = noise.internal;
 
         if (noise.apply_length) {
-            int max_cycles = (64 - noise.sound_length) * (1.0 / 256.0) * 16780000;
+            int max_cycles = (64 - noise.sound_length) * (16780000 / 256);
 
             if (noise_int.length_cycles >= max_cycles) {
                 return 0;

@@ -27,7 +27,6 @@
 #define PPU_INCLUDE
 
 namespace Core {
-
     const u16 COLOR_TRANSPARENT = 0x8000;
 
     class PPU {
@@ -63,8 +62,8 @@ namespace Core {
 
         int m_frame_counter;
 
-        #include "io.hpp"
-        #include "helpers.hpp"
+        #include "io.inl"
+        #include "ppu.inl"
 
         void renderTextBG(int id);
         void renderAffineBG(int id);
@@ -77,7 +76,7 @@ namespace Core {
         void blendPixels(u16* target1, u16 target2, SpecialEffect sfx);
 
     public:
-        PPU(Config* config, u8* paletteMemory, u8* objectMemory, u8* videoMemory);
+        PPU(Config* config, u8* pram, u8* oam, u8* vram);
 
         void reset();
         void reloadConfig();
@@ -86,7 +85,6 @@ namespace Core {
             return regs;
         }
 
-        void setMemoryBuffers(u8* pal, u8* oam, u8* vram);
         void setInterruptController(Interrupt* interrupt);
 
         void hblank();

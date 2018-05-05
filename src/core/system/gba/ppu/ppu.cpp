@@ -26,11 +26,11 @@ using namespace Util;
 
 namespace Core {
 
-    PPU::PPU(Config* config, u8* paletteMemory, u8* objectMemory, u8* videoMemory) :
+    PPU::PPU(Config* config, u8* pram, u8* oam, u8* vram) :
             m_config (config),
-            m_pal    (paletteMemory),
-            m_oam    (objectMemory),
-            m_vram   (videoMemory)
+            m_pal    (pram),
+            m_oam    (oam),
+            m_vram   (vram)
     {
         reset();
         reloadConfig();
@@ -115,12 +115,6 @@ namespace Core {
 
         m_frame_counter = 0;
         line_has_alpha_objs = false;
-    }
-
-    void PPU::setMemoryBuffers(u8* pal, u8* oam, u8* vram) {
-        m_pal  = pal;
-        m_oam  = oam;
-        m_vram = vram;
     }
 
     void PPU::setInterruptController(Interrupt* interrupt) {

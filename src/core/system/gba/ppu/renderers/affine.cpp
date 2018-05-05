@@ -25,7 +25,6 @@ using namespace Util;
 namespace Core {
 
     void PPU::renderAffineBG(int id) {
-
         auto bg        = regs.bgcnt[2 + id];
         u16* buffer    = m_buffer[2 + id];
         u32 tile_block = bg.tile_block << 14;

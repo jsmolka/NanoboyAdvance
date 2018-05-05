@@ -156,7 +156,6 @@ namespace Core {
             int max_y = y + half_height;
 
             if (line >= min_y && line < max_y) {
-
                 int rect_y = line - y;
 
                 int number  = attribute2 & 0x3FF;
@@ -172,9 +171,7 @@ namespace Core {
                     // get pixel eccetera...
                     int screen_x = x + rect_x;
 
-                    // meh...
                     if (screen_x >= 0 && screen_x < 240) {
-
                         // texture coordinates
                         int tex_x = ((pa * rect_x + pb * rect_y) >> 8) + (width  >> 1);
                         int tex_y = ((pc * rect_x + pd * rect_y) >> 8) + (height >> 1);
