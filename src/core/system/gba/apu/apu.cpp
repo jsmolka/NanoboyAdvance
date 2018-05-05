@@ -296,6 +296,18 @@ namespace Core {
     }
 
     void APU::mixChannels(int samples) {
+		// If audio is completely muted we just write a bunch of 0's to the stereo ringbuffer.
+		if (m_config->audio.mute.master) {
+			for (int i = 0; i < samples; i++) {
+				ringbuffers[SIDE_LEFT ][write_pos] = 0;
+				ringbuffers[SIDE_RIGHT][write_pos] = 0;
+
+				// update write position
+				write_pos = (write_pos + 1) & 0x3FFF;
+			}				
+			return;
+		}
+
         auto& psg  = regs.control.psg;
         auto& dma  = regs.control.dma;
         auto& bias = regs.bias;
@@ -314,10 +326,10 @@ namespace Core {
             float volume_right = (float)psg.master[SIDE_RIGHT] / 7.0;
 
             // generate PSG channels
-            s16 tone1 = (s16)generateQuad(0);
-            s16 tone2 = (s16)generateQuad(1);
-            s16 wave  = (s16)generateWave();
-            s16 noise = (s16)generateNoise();
+            s16 tone1 = m_config->audio.mute.psg[0] ? 0 : (s16)generateQuad(0);
+            s16 tone2 = m_config->audio.mute.psg[1] ? 0 : (s16)generateQuad(1);
+            s16 wave  = m_config->audio.mute.psg[2] ? 0 : (s16)generateWave();
+            s16 noise = m_config->audio.mute.psg[3] ? 0 : (s16)generateNoise();
 
             // mix PSGs on the left channel
             if (psg.enable[SIDE_LEFT][0]) output[SIDE_LEFT] += tone1;
@@ -337,6 +349,9 @@ namespace Core {
 
             // add FIFO audio samples
             for (int fifo = 0; fifo < 2; fifo++) {
+            	// Skip FIFO if is muted.
+            	if (m_config->audio.mute.dma[fifo]) continue;
+            	
                 if (dma[fifo].enable[SIDE_LEFT]) {
                     output[SIDE_LEFT ] += fifo_sample[fifo] * fifo_volume[fifo];
                 }
