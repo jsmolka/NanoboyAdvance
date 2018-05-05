@@ -22,10 +22,6 @@
 
 namespace Core {
 
-    ARM::ARM() {
-        ARM::reset();
-    }
-
     void ARM::reset()  {
         std::memset(ctx.reg,  0, sizeof(ctx.reg));
         std::memset(ctx.bank, 0, sizeof(ctx.bank));

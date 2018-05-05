@@ -156,8 +156,6 @@ namespace Core {
             u32 pipe[2];
         };
 
-        ARM();
-
         virtual void reset();
 
         void step();
