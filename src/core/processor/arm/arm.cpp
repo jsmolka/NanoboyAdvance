@@ -27,8 +27,6 @@ namespace Core {
         std::memset(ctx.bank, 0, sizeof(ctx.bank));
         ctx.cpsr   = MODE_SYS;
         ctx.p_spsr = &ctx.spsr[SPSR_DEF];
-
-        refillPipeline();
     }
 
     inline ARM::Bank ARM::modeToBank(ARM::Mode mode) {

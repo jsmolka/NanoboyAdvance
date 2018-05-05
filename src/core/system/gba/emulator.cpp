@@ -39,11 +39,9 @@ namespace Core {
     constexpr u32 Emulator::s_dma_src_mask[4];
     constexpr u32 Emulator::s_dma_len_mask[4];
 
-    Emulator::Emulator(Config* config) : config(config), ppu(config, memory.palette, memory.oam, memory.vram), apu(config) {
-        //// must be initialized *before* calling reset()
-        //memory.rom.save = nullptr;
-        //Emulator::reset();
-
+    Emulator::Emulator(Config* config) : config(config), 
+                                         ppu(config, memory.palette, memory.oam, memory.vram), 
+                                         apu(config) {
         // setup interrupt controller
         m_interrupt.set_flag_register(&regs.irq.flag);
 
