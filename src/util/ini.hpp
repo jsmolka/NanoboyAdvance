@@ -219,6 +219,16 @@ namespace Util {
             readINI();
         }
 
+        auto getSection(std::string section) -> INISection* {
+            auto section_it  = sections.find(section);
+
+            if (section_it != sections.end()) {
+                return section_it->second;
+            } else {
+                throw INISectionNotFoundError(section, "unknown section: " + section);
+            }
+        }
+
         auto getString(std::string section, std::string key) -> std::string {
             return findValueEntry(section, key)->value;
         }

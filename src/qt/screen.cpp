@@ -23,6 +23,7 @@
 #include <QtWidgets>
 #include <QGLFunctions>
 
+#include "util/ini.hpp"
 #include "util/file.hpp"
 
 static const char* s_vertex_shader =
@@ -63,7 +64,7 @@ void Screen::updateTexture() {
     updateGL();
 }
 
-void Screen::compileShader(std::string shader_source) {
+void Screen::compileShader(std::string shader_source, std::unordered_map<std::string, float>& uniforms) {
     QGLFunctions ctx(QGLContext::currentContext());
 
     auto vid = ctx.glCreateShader(GL_VERTEX_SHADER);
@@ -85,6 +86,12 @@ void Screen::compileShader(std::string shader_source) {
 
     ctx.glUseProgram(pid);
 
+    for (auto uniform : uniforms) {
+        auto location = ctx.glGetUniformLocation(pid, uniform.first.c_str());
+
+        ctx.glUniform1f(location, uniform.second);
+    }
+
     // TODO: check compilation status
 }
 
@@ -102,10 +109,27 @@ void Screen::initializeGL() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    std::string shader_path = config->video.shader;
+    std::string shader_path     = config->video.shader;
+    std::string shader_path_fs  = shader_path + ".fs";
+    std::string shader_path_ini = shader_path + ".ini";
 
-    if (!shader_path.empty() && File::exists(shader_path)) {
-        compileShader(File::read_as_string(shader_path));
+    if (!shader_path.empty() && File::exists(shader_path_fs)) {
+        std::unordered_map<std::string, float> uniforms;
+
+        if (File::exists(shader_path_ini)) {
+            Util::INI shader_ini { shader_path_ini, true };
+
+            try {
+                auto section = shader_ini.getSection("Uniform");
+
+                for (auto& pair : *section) {
+                    try {
+                        uniforms[pair.first] = std::stof(pair.second->value);
+                    } catch (std::exception& e) { }
+                }
+            } catch (INISectionNotFoundError& e) { }
+        }
+        compileShader(File::read_as_string(shader_path_fs), uniforms);
     }
 
     clear();

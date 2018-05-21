@@ -25,6 +25,13 @@ if (QT_GUI)
     find_package(Qt5Widgets REQUIRED)
     find_package(Qt5OpenGL REQUIRED)
     set(QT_DEPS Qt5::Gui Qt5::Widgets Qt5::OpenGL)
+
+    add_custom_target(copy_shaders ALL
+        COMMAND ${CMAKE_COMMAND} -DSRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/shaders
+                                 -DDSTDIR=${CMAKE_CURRENT_BINARY_DIR}/src/qt/shaders
+                                 -P ${CMAKE_CURRENT_SOURCE_DIR}/shaders/copy_shaders.cmake
+        COMMENT "Copy GLSL shaders to project build directory."
+    )
 endif()
 
 # SDL2 - required *atleast* for sound

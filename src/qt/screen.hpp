@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include <QGLWidget>
 #include "config.hpp"
 #include "util/integer.hpp"
@@ -31,7 +33,7 @@ public:
     ~Screen();
 
     void updateTexture();
-    void compileShader(std::string shader_source);
+    void compileShader(std::string shader_source, std::unordered_map<std::string, float>& uniforms);
 
     auto sizeHint() const -> QSize;
 
