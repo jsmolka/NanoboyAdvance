@@ -33,8 +33,7 @@ namespace Core {
         std::string bios_path;
 
         // Get rid of these.
-        int  frameskip     = 0;
-        bool darken_screen = false;
+        int  frameskip = 0;
 
         // Video output buffer
         u32* framebuffer = nullptr;
@@ -42,7 +41,7 @@ namespace Core {
         struct Audio {
             int sample_rate;
             int buffer_size;
-            
+
             struct AudioMute {
                 bool psg[4] { false, false, false, false };
                 bool dma[2] { false, false };

@@ -49,28 +49,13 @@ namespace Core {
         m_frameskip   = m_config->frameskip;
         m_framebuffer = m_config->framebuffer;
 
-        // build color LUT
+        // build color conversion LUT
         for (int color = 0; color < 0x8000; color++) {
-            if (m_config->darken_screen) {
-                double r = ((color >> 0 ) & 0x1F) / 31.0;
-                double g = ((color >> 5 ) & 0x1F) / 31.0;
-                double b = ((color >> 10) & 0x1F) / 31.0;
+            int r = (color >> 0 ) & 0x1F;
+            int g = (color >> 5 ) & 0x1F;
+            int b = (color >> 10) & 0x1F;
 
-                r = std::pow(r, 4.0) * 48;
-                g = std::pow(g, 3.0) * 48;
-                b = std::pow(b, 1.4) * 48;
-
-                m_color_lut[color] = 0xFF000000     |
-                                     ((int)b << 0 ) |
-                                     ((int)g << 8 ) |
-                                     ((int)r << 16);
-            } else {
-                int r = (color >> 0 ) & 0x1F;
-                int g = (color >> 5 ) & 0x1F;
-                int b = (color >> 10) & 0x1F;
-
-                m_color_lut[color] = 0xFF000000 | (b << 3) | (g << 11) | (r << 19);
-            }
+            m_color_lut[color] = 0xFF000000 | (b << 3) | (g << 11) | (r << 19);
         }
     }
 

@@ -50,10 +50,9 @@ struct QtConfig : public Core::Config {
         if (ini == nullptr) return;
 
         // Base config
-        bios_path     = ini->getString ("Emulation", "bios");
-        multiplier    = ini->getInteger("Emulation", "fastforward");
-        darken_screen = ini->getInteger("Video",     "darken");
-        frameskip     = ini->getInteger("Video",     "frameskip");
+        bios_path  = ini->getString ("Emulation", "bios");
+        multiplier = ini->getInteger("Emulation", "fastforward");
+        frameskip  = ini->getInteger("Video",     "frameskip");
 
         // Video configuration
         video.scale   = ini->getInteger("Video", "scale");
