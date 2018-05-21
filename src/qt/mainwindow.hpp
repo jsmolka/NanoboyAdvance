@@ -78,10 +78,7 @@ private:
 
     static auto qtKeyToEmu(int key) -> Core::Key;
 
-    // Configuration file
-    Util::INI ini { "config.ini", true };
-
-    Screen screen { 240, 160, this };
+    Screen* screen;
 
     QTimer timer_run { this };
     QTimer timer_fps { this };
@@ -118,6 +115,8 @@ private:
 
     // Keep track of emulation state: Running/Stopped/Paused
     EmulationState emu_state = EmulationState::Stopped;
+
+    Util::INI ini { "config.ini", true };
 
     // Emulator instance
     QtConfig*       config   = nullptr;

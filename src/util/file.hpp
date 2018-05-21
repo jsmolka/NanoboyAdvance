@@ -27,9 +27,9 @@
 #include "integer.hpp"
 
 namespace Util {
-    
+
     namespace File {
-        
+
         /// Determines wether a file exists.
         /// @param    filename  the file to check.
         /// @returns  wether the file exists.
@@ -44,6 +44,8 @@ namespace Util {
         /// @param    filename  the file to read.
         /// @returns  the byte array.
         u8* read_data(std::string filename);
+
+        std::string read_as_string(std::string filename);
 
         /// Writes a byte array to a file.
         /// @param  filename  the file to write

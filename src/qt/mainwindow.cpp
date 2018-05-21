@@ -36,14 +36,16 @@ using namespace Core;
 MainWindow::MainWindow(QApplication* app, QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("NanoboyAdvance");
 
-    setCentralWidget(&screen);
-
     setupMenu();
     setupEmuTimers();
     setupStatusBar();
 
     config = QtConfig::fromINI(&ini);
-    config->framebuffer = screen.pixels();
+
+    screen = new Screen(config, 240, 160, this);
+    setCentralWidget(screen);
+
+    config->framebuffer = screen->pixels();
 
     resetUI();
     applyConfiguration();
@@ -176,19 +178,19 @@ void MainWindow::setupStatusBar() {
 }
 
 void MainWindow::resetUI() {
-    screen.clear();
+    screen->clear();
     status_msg.setText(tr("Idle..."));
 }
 
 void MainWindow::applyConfiguration() {
-    screen.aspectRatio(config->video.keep_ar);
+    screen->aspectRatio(config->video.keep_ar);
 }
 
 void MainWindow::nextFrame() {
     emulator->runFrame();
     frames++;
 
-    screen.updateTexture();
+    screen->updateTexture();
 }
 
 void MainWindow::showOpenFileDialog() {

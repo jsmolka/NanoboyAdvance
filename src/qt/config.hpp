@@ -22,10 +22,11 @@
 #include "util/ini.hpp"
 #include "core/system/gba/config.hpp"
 
-struct QtConfig : public Core::Config { 
+struct QtConfig : public Core::Config {
     struct Video {
         int  scale;
         bool keep_ar;
+        std::string shader;
     } video;
 
     struct Keymap {
@@ -34,7 +35,7 @@ struct QtConfig : public Core::Config {
 
     static auto fromINI(Util::INI* ini) -> QtConfig* {
         auto config = new QtConfig();
-        
+
         QtConfig::fromINI(ini, config);
 
         return config;
@@ -57,7 +58,8 @@ struct QtConfig : public Core::Config {
         // Video configuration
         video.scale   = ini->getInteger("Video", "scale");
         video.keep_ar = ini->getInteger("Video", "aspectratio");
-    
+        video.shader  = ini->getString ("Video", "shader_path");
+
         // Audio quality
         audio.sample_rate = ini->getInteger("Audio", "sample_rate");
         audio.buffer_size = ini->getInteger("Audio", "buffer_size");

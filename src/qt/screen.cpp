@@ -23,6 +23,8 @@
 #include <QtWidgets>
 #include <QGLFunctions>
 
+#include "util/file.hpp"
+
 static const char* s_vertex_shader =
     "varying vec2 uv;\n"
     "void main(void) {\n"
@@ -30,7 +32,9 @@ static const char* s_vertex_shader =
     "    uv = gl_MultiTexCoord0;\n"
     "}";
 
-Screen::Screen(int width, int height, QWidget* parent) : QGLWidget(parent), width(width), height(height) {
+using namespace Util;
+
+Screen::Screen(QtConfig* config, int width, int height, QWidget* parent) : QGLWidget(parent), width(width), height(height), config(config) {
     framebuffer = new u32[width * height];
     clear();
 }
@@ -59,16 +63,14 @@ void Screen::updateTexture() {
     updateGL();
 }
 
-void Screen::compileShaders() {
+void Screen::compileShader(std::string shader_source) {
     QGLFunctions ctx(QGLContext::currentContext());
-
-    std::string frag = "uniform sampler2D tex; varying vec2 uv; void main(void) { gl_FragColor = texture(tex, uv) * vec4(1.0, 0.0, 0.0, 1.0); }";
 
     auto vid = ctx.glCreateShader(GL_VERTEX_SHADER);
     auto fid = ctx.glCreateShader(GL_FRAGMENT_SHADER);
 
     const char* vert_src[] = { s_vertex_shader };
-    const char* frag_src[] = { frag.c_str() };
+    const char* frag_src[] = { shader_source.c_str() };
 
     ctx.glShaderSource(vid, 1, vert_src, nullptr);
     ctx.glShaderSource(fid, 1, frag_src, nullptr);
@@ -100,7 +102,11 @@ void Screen::initializeGL() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    compileShaders();
+    std::string shader_path = config->video.shader;
+
+    if (!shader_path.empty() && File::exists(shader_path)) {
+        compileShader(File::read_as_string(shader_path));
+    }
 
     clear();
 }

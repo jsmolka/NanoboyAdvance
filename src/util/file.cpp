@@ -28,11 +28,11 @@
 using namespace std;
 
 namespace Util {
-    
+
     namespace File {
-        
+
         bool exists(string filename) {
-            
+
             ifstream ifs(filename);
             bool exists = ifs.is_open();
 
@@ -42,7 +42,7 @@ namespace Util {
         }
 
         int get_size(string filename) {
-            
+
             ifstream ifs(filename, ios::in | ios::binary | ios::ate);
 
             if (ifs.is_open()) {
@@ -54,7 +54,7 @@ namespace Util {
         }
 
         u8* read_data(string filename) {
-            
+
             ifstream ifs(filename, ios::in | ios::binary | ios::ate);
             size_t filesize;
             u8* data = 0;
@@ -71,6 +71,21 @@ namespace Util {
             }
 
             return data;
+        }
+
+        std::string read_as_string(std::string filename) {
+            std::string str;
+            std::ifstream ifs(filename);
+
+            // Reserve enough space in the sting to avoid dynamic reallocation.
+            ifs.seekg(0, std::ios::end);
+            str.reserve(ifs.tellg());
+            ifs.seekg(0, std::ios::beg);
+
+            str.assign((std::istreambuf_iterator<char>(ifs)),
+                        std::istreambuf_iterator<char>());
+
+            return str;
         }
 
         void write_data(string filename, u8* data, int size) {

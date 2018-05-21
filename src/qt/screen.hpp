@@ -20,17 +20,18 @@
 #pragma once
 
 #include <QGLWidget>
+#include "config.hpp"
 #include "util/integer.hpp"
 
 class Screen : public QGLWidget {
     Q_OBJECT
 
 public:
-     Screen(int width, int height, QWidget *parent = 0);
+     Screen(QtConfig* config, int width, int height, QWidget *parent = 0);
     ~Screen();
 
     void updateTexture();
-    void compileShaders();
+    void compileShader(std::string shader_source);
 
     auto sizeHint() const -> QSize;
 
@@ -50,6 +51,8 @@ private:
     int  height;
     u32* framebuffer;
     bool aspect_ratio;
+
+    QtConfig* config;
 
     GLuint texture;
 };
