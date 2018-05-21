@@ -63,7 +63,7 @@ set(PPU_SRC
 )
 
 set(PPU_HDR
-    system/gba/ppu/io.hpp
+    system/gba/ppu/io.inl
     system/gba/ppu/enums.hpp
     system/gba/ppu/ppu.hpp
 )
