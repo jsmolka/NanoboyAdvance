@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QStatusBar>
@@ -39,14 +41,13 @@ public:
     ~MainWindow();
 
 public slots:
-    // Shows Open ROM dialog
-    void openGame();
+    void showOpenFileDialog();
 
     void nextFrame();
 
 protected:
     bool eventFilter(QObject* obj, QEvent* event);
-    
+
 private:
     enum class EmulationState {
         Stopped,
@@ -58,7 +59,6 @@ private:
     void setupFileMenu();
     void setupHelpMenu();
     void setupEmulationMenu();
-    void setupScreen();
     void setupEmuTimers();
     void setupStatusBar();
 
@@ -81,16 +81,14 @@ private:
     // Configuration file
     Util::INI ini { "config.ini", true };
 
-    // Display widget
-    Screen* screen;
+    Screen screen { 240, 160, this };
 
-    // Timer
-    QTimer* timer_run;
-    QTimer* timer_fps;
+    QTimer timer_run { this };
+    QTimer timer_fps { this };
 
     // Program Status
-    QLabel*     status_msg;
-    QStatusBar* status_bar;
+    QLabel     status_msg { this };
+    QStatusBar status_bar { this };
 
     // Menu structure
     struct {
@@ -116,12 +114,12 @@ private:
         } help;
     } menubar;
 
-    int frames {0};
+    int frames = 0;
 
     // Keep track of emulation state: Running/Stopped/Paused
-    EmulationState emu_state { EmulationState::Stopped };
+    EmulationState emu_state = EmulationState::Stopped;
 
     // Emulator instance
-    QtConfig*       config   { nullptr }; /* custom class */
-    Core::Emulator* emulator { nullptr };
+    QtConfig*       config   = nullptr;
+    Core::Emulator* emulator = nullptr;
 };

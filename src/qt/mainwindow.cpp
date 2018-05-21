@@ -36,18 +36,18 @@ using namespace Core;
 MainWindow::MainWindow(QApplication* app, QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("NanoboyAdvance");
 
+    setCentralWidget(&screen);
+
     setupMenu();
-    setupScreen();
     setupEmuTimers();
     setupStatusBar();
 
-    // Setup configuration
     config = QtConfig::fromINI(&ini);
-    config->framebuffer = screen->pixels();
+    config->framebuffer = screen.pixels();
 
     resetUI();
     applyConfiguration();
-    
+
     app->installEventFilter(this);
 }
 
@@ -59,19 +59,18 @@ MainWindow::~MainWindow() {
     if (config != nullptr) {
         delete config;
     }
-    // TODO: delete UI elements!
 }
 
-bool MainWindow::eventFilter(QObject *obj, QEvent *event) {   
+bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     auto type = event->type();
-    
+
     if (type == QEvent::KeyPress || type == QEvent::KeyRelease) {
         QKeyEvent* key_event = static_cast<QKeyEvent*>(event);
-        
+
         auto key = key_event->key();
-        
+
         bool is_press = type == QEvent::KeyPress;
-        
+
         if (emulator == nullptr) {
             return QObject::eventFilter(obj, event);
         }
@@ -80,7 +79,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
             return true;
         }
         emulator->setKeyState(MainWindow::qtKeyToEmu(key), is_press);
-        
+
         return true;
     }
     return QObject::eventFilter(obj, event);
@@ -106,8 +105,8 @@ void MainWindow::setupFileMenu() {
     file.open  = file.menu->addAction(tr("&Open"));
     file.close = file.menu->addAction(tr("&Close"));
 
-    connect(file.open,  &QAction::triggered, this, &MainWindow::openGame);
-    connect(file.close, &QAction::triggered, this, &QApplication::quit  );
+    connect(file.open,  &QAction::triggered, this, &MainWindow::showOpenFileDialog);
+    connect(file.close, &QAction::triggered, this, &QApplication::quit);
 }
 
 void MainWindow::setupHelpMenu() {
@@ -147,66 +146,52 @@ void MainWindow::setupEmulationMenu() {
     connect(emulation.stop,  &QAction::triggered, this, &MainWindow::stopClicked );
 }
 
-void MainWindow::setupScreen() {
-    screen = new Screen(240, 160, this);
-
-    // Make screen widget our central widget
-    setCentralWidget(screen);
-}
-
 void MainWindow::setupEmuTimers() {
-    // Create main timer, ticks at 60Hz
-    timer_run = new QTimer {this};
-    timer_run->setSingleShot(false);
-    timer_run->setInterval(16);
+    // Setup main timer, ticks at 60Hz
+    timer_run.setSingleShot(false);
+    timer_run.setInterval(16);
 
-    // Create FPS timer, ticks at 1Hz
-    timer_fps = new QTimer {this};
-    timer_fps->setSingleShot(false);
-    timer_fps->setInterval(1000);
+    // Setup FPS timer, ticks once a second.
+    timer_fps.setSingleShot(false);
+    timer_fps.setInterval(1000);
 
     // Call "nextFrame" each time the main timer ticks
-    connect(timer_run, &QTimer::timeout, this, &MainWindow::nextFrame);
+    connect(&timer_run, &QTimer::timeout, this, &MainWindow::nextFrame);
 
     // FPS timer event
-    connect(timer_fps, &QTimer::timeout, this,
+    connect(&timer_fps, &QTimer::timeout, this,
         [this] {
             auto message = std::to_string(frames) + " FPS";
 
             frames = 0;
-            status_msg->setText(QString(message.c_str()));
+            status_msg.setText(QString(message.c_str()));
         }
     );
 }
 
 void MainWindow::setupStatusBar() {
-    // Create status bar with label text
-    status_msg = new QLabel     {this};
-    status_bar = new QStatusBar {this};
-    status_bar->addPermanentWidget(status_msg);
+    status_bar.addPermanentWidget(&status_msg);
 
-    // Assign status bar to main window
-    setStatusBar(status_bar);
+    setStatusBar(&status_bar);
 }
 
 void MainWindow::resetUI() {
-    screen->clear();
-    status_msg->setText(tr("Idle..."));
+    screen.clear();
+    status_msg.setText(tr("Idle..."));
 }
 
 void MainWindow::applyConfiguration() {
-    screen->aspectRatio(config->video.keep_ar);
+    screen.aspectRatio(config->video.keep_ar);
 }
 
 void MainWindow::nextFrame() {
-    // Emulate the next frame(s)
     emulator->runFrame();
     frames++;
 
-    screen->updateTexture();
+    screen.updateTexture();
 }
 
-void MainWindow::openGame() {
+void MainWindow::showOpenFileDialog() {
     QFileDialog dialog {this};
 
     dialog.setAcceptMode (QFileDialog::AcceptOpen);
@@ -268,14 +253,9 @@ void MainWindow::runGame(const QString& rom_file) {
 
     emu_state = EmulationState::Running;
 
-    // Start FPS counting
     frames = 0;
-    timer_fps->start();
-
-    // Start emulating
-    timer_run->start();
-
-    //screen->grabKeyboard();
+    timer_fps.start();
+    timer_run.start();
 }
 
 void MainWindow::pauseClicked() {
@@ -283,28 +263,28 @@ void MainWindow::pauseClicked() {
         case EmulationState::Paused:
             SDL_PauseAudio(0);
 
-            timer_run->start();
-            timer_fps->start();
+            timer_run.start();
+            timer_fps.start();
 
             emu_state = EmulationState::Running;
             break;
 
         case EmulationState::Running:
             SDL_PauseAudio(1);
-            
-            timer_run->stop();
-            timer_fps->stop();
-            
+
+            timer_run.stop();
+            timer_fps.stop();
+
             emu_state = EmulationState::Paused;
             break;
-            
+
         default: break;
     }
 }
 
 void MainWindow::stopClicked() {
-    timer_run->stop();
-    timer_fps->stop();
+    timer_run.stop();
+    timer_fps.stop();
 
     closeAudio();
     resetUI();
@@ -318,7 +298,7 @@ void MainWindow::stopClicked() {
 void MainWindow::soundCallback(void* _apu, u8* _stream, int length) {
     APU* apu = (APU*)_apu;
     u16* stream = (u16*)_stream;
-    
+
     apu->fillBuffer(stream, length);
 
     // Temporary workaround *sigh*
