@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QStatusBar>

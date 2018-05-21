@@ -73,6 +73,6 @@ struct QtConfig : public Core::Config {
         audio.mute.dma[1] = ini->getInteger("Audio", "mute_dma1");
     }
 private:
-    Util::INI* ini { nullptr };
+    Util::INI* ini = nullptr;
 
 };
