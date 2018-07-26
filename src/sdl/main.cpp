@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
 
     // [Video]
     scale                  = g_ini->getInteger("Video", "scale");
-    g_config.darken_screen = g_ini->getInteger("Video", "darken"); // boolean!
+    //g_config.darken_screen = g_ini->getInteger("Video", "darken"); // boolean!
     g_config.frameskip     = g_ini->getInteger("Video", "frameskip");
 
     g_config.audio.sample_rate = 44100;
@@ -223,7 +223,7 @@ int main(int argc, char** argv) {
 
 void soundCallback(void* apu, u8* stream, int length) {
     APU* _apu = (APU*)apu;
-    
+
     _apu->fillBuffer((u16*)stream, length);
 }
 
