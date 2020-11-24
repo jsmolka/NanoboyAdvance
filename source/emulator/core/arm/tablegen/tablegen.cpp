@@ -20,38 +20,6 @@ using Handler32 = ARM7TDMI::Handler32;
   * the interpreter class and its header itself.
   */
 struct TableGen {
-  #ifdef __clang__
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Weverything"
-  #endif
-
-  #include "gen_arm.hpp"
-  #include "gen_thumb.hpp"
-
-  #ifdef __clang__
-  #pragma clang diagnostic pop
-  #endif
-
-  static constexpr auto GenerateTableThumb() -> std::array<Handler16, 1024> {
-    std::array<Handler16, 1024> lut{};
-
-    common::static_for<std::size_t, 0, 1024>([&](auto i) {
-      lut[i] = GenerateHandlerThumb<i << 6>();
-    });
-    return lut;
-  }
-
-  static constexpr auto GenerateTableARM() -> std::array<Handler32, 4096> {
-    std::array<Handler32, 4096> lut{};
-
-    common::static_for<std::size_t, 0, 4096>([&](auto i) {
-      lut[i] = GenerateHandlerARM<
-        ((i & 0xFF0) << 16) |
-        ((i & 0xF) << 4)>();
-    });
-    return lut;
-  }
-
   static constexpr auto GenerateConditionTable() -> std::array<bool, 256> {
     std::array<bool, 256> lut{};
     
@@ -83,8 +51,6 @@ struct TableGen {
   }
 };
 
-std::array<Handler16, 1024> ARM7TDMI::s_opcode_lut_16 = TableGen::GenerateTableThumb();
-std::array<Handler32, 4096> ARM7TDMI::s_opcode_lut_32 = TableGen::GenerateTableARM();
 std::array<bool, 256> ARM7TDMI::s_condition_lut = TableGen::GenerateConditionTable();
 
 } // namespace nba::core::arm

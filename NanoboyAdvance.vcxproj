@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release with symbols|x64">
+      <Configuration>Release with symbols</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{2204e1f8-6ad7-4ec6-943c-d2cb7eb7d62b}</ProjectGuid>
+    <ProjectName>NanoboyAdvance</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release with symbols|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release with symbols|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediate\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediate\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release with symbols|x64'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediate\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)source\;$(ProjectDir)source\third_party\fmtlib\include\</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <PreprocessorDefinitions>
+      </PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <ProgramDatabaseFile>$(SolutionDir)bin\intermediate\$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)source\;$(ProjectDir)source\third_party\fmtlib\include\</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>NDEBUG</PreprocessorDefinitions>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(SolutionDir)bin\intermediate\$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapFileName>$(SolutionDir)bin\intermediate\$(Configuration)\$(TargetName).map</MapFileName>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release with symbols|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)source\;$(ProjectDir)source\third_party\fmtlib\include\</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <PreprocessorDefinitions>
+      </PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(SolutionDir)bin\intermediate\$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="source\common\log.cpp" />
+    <ClCompile Include="source\emulator\cartridge\backup\eeprom.cpp" />
+    <ClCompile Include="source\emulator\cartridge\backup\flash.cpp" />
+    <ClCompile Include="source\emulator\cartridge\game_db.cpp" />
+    <ClCompile Include="source\emulator\cartridge\gpio\gpio.cpp" />
+    <ClCompile Include="source\emulator\cartridge\gpio\rtc.cpp" />
+    <ClCompile Include="source\emulator\config\config_toml.cpp" />
+    <ClCompile Include="source\emulator\core\arm\tablegen\tablegen.cpp" />
+    <ClCompile Include="source\emulator\core\cpu-mmio.cpp" />
+    <ClCompile Include="source\emulator\core\cpu.cpp" />
+    <ClCompile Include="source\emulator\core\hw\apu\apu.cpp" />
+    <ClCompile Include="source\emulator\core\hw\apu\callback.cpp" />
+    <ClCompile Include="source\emulator\core\hw\apu\channel\channel_noise.cpp" />
+    <ClCompile Include="source\emulator\core\hw\apu\channel\channel_quad.cpp" />
+    <ClCompile Include="source\emulator\core\hw\apu\channel\channel_wave.cpp" />
+    <ClCompile Include="source\emulator\core\hw\apu\registers.cpp" />
+    <ClCompile Include="source\emulator\core\hw\dma.cpp" />
+    <ClCompile Include="source\emulator\core\hw\interrupt.cpp" />
+    <ClCompile Include="source\emulator\core\hw\ppu\compose.cpp" />
+    <ClCompile Include="source\emulator\core\hw\ppu\ppu.cpp" />
+    <ClCompile Include="source\emulator\core\hw\ppu\registers.cpp" />
+    <ClCompile Include="source\emulator\core\hw\ppu\render\affine.cpp" />
+    <ClCompile Include="source\emulator\core\hw\ppu\render\bitmap.cpp" />
+    <ClCompile Include="source\emulator\core\hw\ppu\render\oam.cpp" />
+    <ClCompile Include="source\emulator\core\hw\ppu\render\text.cpp" />
+    <ClCompile Include="source\emulator\core\hw\ppu\render\window.cpp" />
+    <ClCompile Include="source\emulator\core\hw\serial.cpp" />
+    <ClCompile Include="source\emulator\core\hw\timer.cpp" />
+    <ClCompile Include="source\emulator\emulator.cpp" />
+    <ClCompile Include="source\platform\sdl\main.cpp" />
+    <ClCompile Include="source\third_party\fmtlib\src\format.cc" />
+    <ClCompile Include="source\third_party\fmtlib\src\os.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\common\dsp\resampler.hpp" />
+    <ClInclude Include="source\common\dsp\resampler\blep.hpp" />
+    <ClInclude Include="source\common\dsp\resampler\cosine.hpp" />
+    <ClInclude Include="source\common\dsp\resampler\cubic.hpp" />
+    <ClInclude Include="source\common\dsp\resampler\nearest.hpp" />
+    <ClInclude Include="source\common\dsp\resampler\windowed-sinc.hpp" />
+    <ClInclude Include="source\common\dsp\ring_buffer.hpp" />
+    <ClInclude Include="source\common\dsp\stereo.hpp" />
+    <ClInclude Include="source\common\dsp\stream.hpp" />
+    <ClInclude Include="source\common\framelimiter.hpp" />
+    <ClInclude Include="source\common\likely.hpp" />
+    <ClInclude Include="source\common\log.hpp" />
+    <ClInclude Include="source\common\m4a.hpp" />
+    <ClInclude Include="source\common\static_for.hpp" />
+    <ClInclude Include="source\emulator\cartridge\backup\backup.hpp" />
+    <ClInclude Include="source\emulator\cartridge\backup\backup_file.hpp" />
+    <ClInclude Include="source\emulator\cartridge\backup\eeprom.hpp" />
+    <ClInclude Include="source\emulator\cartridge\backup\flash.hpp" />
+    <ClInclude Include="source\emulator\cartridge\backup\sram.hpp" />
+    <ClInclude Include="source\emulator\cartridge\game_db.hpp" />
+    <ClInclude Include="source\emulator\cartridge\gpio\gpio.hpp" />
+    <ClInclude Include="source\emulator\cartridge\gpio\rtc.hpp" />
+    <ClInclude Include="source\emulator\cartridge\header.hpp" />
+    <ClInclude Include="source\emulator\config\config.hpp" />
+    <ClInclude Include="source\emulator\config\config_toml.hpp" />
+    <ClInclude Include="source\emulator\core\arm\arm7tdmi.hpp" />
+    <ClInclude Include="source\emulator\core\arm\memory.hpp" />
+    <ClInclude Include="source\emulator\core\arm\state.hpp" />
+    <ClInclude Include="source\emulator\core\cpu-mmio.hpp" />
+    <ClInclude Include="source\emulator\core\cpu.hpp" />
+    <ClInclude Include="source\emulator\core\hw\apu\apu.hpp" />
+    <ClInclude Include="source\emulator\core\hw\apu\channel\channel_noise.hpp" />
+    <ClInclude Include="source\emulator\core\hw\apu\channel\channel_quad.hpp" />
+    <ClInclude Include="source\emulator\core\hw\apu\channel\channel_wave.hpp" />
+    <ClInclude Include="source\emulator\core\hw\apu\channel\fifo.hpp" />
+    <ClInclude Include="source\emulator\core\hw\apu\channel\sequencer.hpp" />
+    <ClInclude Include="source\emulator\core\hw\apu\registers.hpp" />
+    <ClInclude Include="source\emulator\core\hw\dma.hpp" />
+    <ClInclude Include="source\emulator\core\hw\interrupt.hpp" />
+    <ClInclude Include="source\emulator\core\hw\ppu\ppu.hpp" />
+    <ClInclude Include="source\emulator\core\hw\ppu\registers.hpp" />
+    <ClInclude Include="source\emulator\core\hw\serial.hpp" />
+    <ClInclude Include="source\emulator\core\hw\timer.hpp" />
+    <ClInclude Include="source\emulator\core\scheduler.hpp" />
+    <ClInclude Include="source\emulator\device\audio_device.hpp" />
+    <ClInclude Include="source\emulator\device\input_device.hpp" />
+    <ClInclude Include="source\emulator\device\video_device.hpp" />
+    <ClInclude Include="source\emulator\emulator.hpp" />
+    <ClInclude Include="source\platform\sdl\device\audio_device.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="source\emulator\core\arm\handlers\arithmetic.inl" />
+    <None Include="source\emulator\core\arm\handlers\handler16.inl" />
+    <None Include="source\emulator\core\arm\handlers\handler32.inl" />
+    <None Include="source\emulator\core\arm\handlers\memory.inl" />
+    <None Include="source\emulator\core\cpu-memory.inl" />
+    <None Include="source\emulator\core\hw\ppu\helper.inl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -189,8 +189,6 @@ private:
   } pipe;
 
   static std::array<bool, 256> s_condition_lut;
-  static std::array<Handler16, 1024> s_opcode_lut_16;
-  static std::array<Handler32, 4096> s_opcode_lut_32;
 };
 
 } // namespace nba::core::arm
